@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Icons -->
+  <!-- Heroicons (inline SVG usage) -->
+</head>
+<body class="bg-gray-100 font-inter">
+
+  <!-- Layout Wrapper -->
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r hidden md:flex flex-col">
+      <div class="p-6 text-xl font-bold text-blue-600">BoostPanel</div>
+      <nav class="flex-1 px-4 space-y-2">
+        <a href="#" class="block px-4 py-2 rounded bg-blue-50 text-blue-600 font-medium">Dashboard</a>
+        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Deposit</a>
+        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Orders</a>
+        <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Settings</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+
+      <!-- Topbar -->
+      <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
+        <div>
+          <p class="text-sm text-gray-500">Welcome back</p>
+          <h1 class="text-xl font-semibold">Micheal Ugochukwu 👋</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <button class="relative">
+            <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            🔔
+          </button>
+          <img src="https://ui-avatars.com/api/?name=Micheal+U" class="w-9 h-9 rounded-full" />
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <section class="p-6 space-y-6">
+
+        <!-- Wallet Card -->
+        <div class="bg-blue-600 text-white rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="col-span-2">
+            <p class="text-sm opacity-80">Wallet Balance</p>
+            <h2 class="text-3xl font-bold">₦3,270</h2>
+            <p class="text-sm opacity-80">$2.18</p>
+          </div>
+          <div class="flex items-center justify-between md:justify-end gap-4">
+            <button class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg> Deposit
+            </button>
+            <button class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 2L11 13" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 2L15 22l-4-9-9-4 20-7z" /></svg> Transfer
+            </button>
+            <button class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 17h16M10 3l-4 4 4 4M14 21l4-4-4-4" /></svg> Exchange
+            </button>
+          </div>
+        </div>
+
+        <!-- Services -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Services</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow transition flex items-center gap-4">
+              <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2" ry="2" /><path d="M11 18h2" /></svg>
+              </div>
+              <span class="font-medium">Airtime</span>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="bg-white rounded-xl p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Recent Orders</h3>
+            <a href="#" class="text-blue-600 text-sm">View All</a>
+          </div>
+          <!-- Desktop Table -->
+          <div class="hidden md:block">
+            <table class="w-full text-sm">
+              <thead class="text-left text-gray-500">
+                <tr>
+                  <th class="py-2">Service</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3">Instagram Boost</td>
+                  <td class="text-green-600">Completed</td>
+                  <td>₦1,500</td>
+                  <td>02 Feb 2026</td>
+                  <td><a href="#" class="text-blue-600">View</a></td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3">TikTok Likes</td>
+                  <td class="text-yellow-600">Processing</td>
+                  <td>₦800</td>
+                  <td>01 Feb 2026</td>
+                  <td><a href="#" class="text-blue-600">View</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Vertical Orders -->
+          <div class="space-y-4 md:hidden">
+            <div class="border rounded-lg p-4">
+              <div class="flex justify-between items-center">
+                <span class="font-medium">Instagram Boost</span>
+                <span class="text-green-600 text-sm">Completed</span>
+              </div>
+              <div class="mt-2 text-sm text-gray-500">Amount: ₦1,500</div>
+              <div class="text-sm text-gray-500">Date: 02 Feb 2026</div>
+              <a href="#" class="inline-block mt-2 text-blue-600 text-sm">View Order</a>
+            </div>
+
+            <div class="border rounded-lg p-4">
+              <div class="flex justify-between items-center">
+                <span class="font-medium">TikTok Likes</span>
+                <span class="text-yellow-600 text-sm">Processing</span>
+              </div>
+              <div class="mt-2 text-sm text-gray-500">Amount: ₦800</div>
+              <div class="text-sm text-gray-500">Date: 01 Feb 2026</div>
+              <a href="#" class="inline-block mt-2 text-blue-600 text-sm">View Order</a>
+            </div>
+          </div>
+        </div>
+
+      <!-- Deposit Page -->
+      <section class="p-6 space-y-6">
+        <h2 class="text-xl font-semibold">Deposit Funds</h2>
+
+        <!-- Deposit Methods -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-xl border hover:shadow">
+            <h3 class="font-medium">Bank Transfer</h3>
+            <p class="text-sm text-gray-500 mt-1">Instant or manual confirmation</p>
+            <button class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg">Deposit</button>
+          </div>
+          <div class="bg-white p-5 rounded-xl border hover:shadow">
+            <h3 class="font-medium">Card Payment</h3>
+            <p class="text-sm text-gray-500 mt-1">Pay with debit / credit card</p>
+            <button class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg">Deposit</button>
+          </div>
+          <div class="bg-white p-5 rounded-xl border hover:shadow">
+            <h3 class="font-medium">Crypto</h3>
+            <p class="text-sm text-gray-500 mt-1">USDT, BTC, ETH supported</p>
+            <button class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg">Deposit</button>
+          </div>
+        </div>
+
+        <!-- Deposit Form -->
+        <div class="bg-white p-6 rounded-xl max-w-lg">
+          <h3 class="font-semibold mb-4">Make a Deposit</h3>
+          <form class="space-y-4">
+            <div>
+              <label class="text-sm font-medium">Amount</label>
+              <input type="number" placeholder="5000" class="w-full mt-1 border rounded-lg px-4 py-2" />
+            </div>
+            <div>
+              <label class="text-sm font-medium">Payment Method</label>
+              <select class="w-full mt-1 border rounded-lg px-4 py-2">
+                <option>Bank Transfer</option>
+                <option>Card</option>
+                <option>Crypto</option>
+              </select>
+            </div>
+            <button class="w-full bg-blue-600 text-white py-2 rounded-lg">Proceed</button>
+          </form>
+        </div>
+
+        <!-- Deposit Status Page -->
+        <div class="bg-white p-6 rounded-xl max-w-lg">
+          <h3 class="font-semibold mb-4">Deposit Status</h3>
+          <div class="space-y-2 text-sm">
+            <p><span class="text-gray-500">Reference:</span> DEP-239023</p>
+            <p><span class="text-gray-500">Amount:</span> ₦5,000</p>
+            <p><span class="text-gray-500">Method:</span> Bank Transfer</p>
+            <p><span class="text-gray-500">Status:</span> <span class="text-yellow-600">Pending</span></p>
+          </div>
+          <button class="mt-4 w-full border rounded-lg py-2">Refresh Status</button>
+        </div>
+
+        <!-- Single Order Details Page -->
+        <div class="bg-white p-6 rounded-xl max-w-2xl">
+          <h3 class="font-semibold mb-4">Order Details</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <p><span class="text-gray-500">Order ID:</span> ORD-12039</p>
+            <p><span class="text-gray-500">Service:</span> Instagram Followers</p>
+            <p><span class="text-gray-500">Category:</span> Instagram</p>
+            <p><span class="text-gray-500">Quantity:</span> 5,000</p>
+            <p><span class="text-gray-500">Rate:</span> ₦15 / 1000</p>
+            <p><span class="text-gray-500">Amount:</span> ₦75</p>
+            <p><span class="text-gray-500">Target URL:</span> <a class="text-blue-600" href="#">View</a></p>
+            <p><span class="text-gray-500">Status:</span> <span class="text-green-600">Completed</span></p>
+          </div>
+
+          <div class="mt-6">
+            <h4 class="font-medium mb-2">Progress</h4>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>

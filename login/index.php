@@ -1,4 +1,55 @@
-<?php include('../server/connection.php') ?>
+<?php include('../server/connection.php');
+
+$error = "";
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $login    = trim($_POST['login']);   // username or email
+    $password = $_POST['password'];
+
+    if (empty($login) || empty($password)) {
+        $error = "All fields are required.";
+    } else {
+
+        // Fetch user by email OR username
+        $stmt = $connection->prepare(
+            "SELECT id,  email, password 
+             FROM users 
+             WHERE email = ? 
+             LIMIT 1"
+        );
+
+        $stmt->bind_param("s", $login);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+
+            $user = $result->fetch_assoc();
+
+            // Verify password
+            if (password_verify($password, $user['password'])) {
+
+                // Login success → set session
+                $_SESSION['user_id']   = $user['id'];
+
+                echo "<script>
+                  setTimeout(()=>{
+                    window.location.href = '../user/dashboard/'
+                  },2000)
+                </script>";
+            } else {
+                $error = "Invalid login details.";
+            }
+        } else {
+            $error = "Invalid login details.";
+        }
+
+        $stmt->close();
+    }
+}
+?>
+
 
 <!DOCTYPE html>
 <html class="no-js" lang="en">
@@ -43,19 +94,7 @@
 <body>
     <div id="tj-overlay-bg2" class="tj-overlay-canvas"></div>
 
-    <!-- preloader -->
-    <div id="loading">
-        <div id="loading-center">
-            <div id="loading-center-absolute">
-                <div class="object" id="object_four"></div>
-                <div class="object-1" id="object_three"></div>
-                <div class="object-2" id="object_two"></div>
-                <div class="object-3" id="object_one"></div>
-            </div>
-            <button class="closeLoader tj-primary-black-btn"><span>Cancel Preloader</span></button>
-        </div>
-    </div>
-    <!-- end: Preloader -->
+
 
     <!--========== Mobile Menu Start ==============-->
     <div class="tj-offcanvas-area">
@@ -78,75 +117,85 @@
     <?php include('../include/nav.php') ?>
 
     <!--========== Contact Section Start ==============-->
-   <section class="tj-contact-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="tj-contact-content-one">
-                    <div class="tj-sec-heading">
-                        <span class="sub-title"> Welcome Back</span>
-                        <h2 class="title">Login to <?php echo $sitename ?></h2>
-                        <p class="desc">
-                            Access your <?php echo $sitename ?> account to manage your social media boosts, track your orders, and grow your audience faster across all platforms.
-                        </p>
-                    </div>
-                    <div class="image-box hover-shape-border">
-                        <img class="img-1" src="../assets/images/progress/contact-image.png" alt="Image" />
-                        <div class="testimonial-item-shape">
-                            <span class="border-shadow shadow-1"></span>
-                            <span class="border-shadow shadow-2"></span>
+    <section class="tj-contact-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="tj-contact-content-one">
+                        <div class="tj-sec-heading">
+                            <span class="sub-title"> Welcome Back</span>
+                            <h2 class="title">Login to <?php echo $sitename ?></h2>
+                            <p class="desc">
+                                Access your <?php echo $sitename ?> account to manage your social media boosts, track your orders, and grow your audience faster across all platforms.
+                            </p>
                         </div>
-                        <div class="box-shape pulse">
-                            <img src="../assets/images/shape/sec-shape5.svg" alt="Shape" />
+                        <div class="image-box hover-shape-border">
+                            <img class="img-1" src="../assets/images/progress/contact-image.png" alt="Image" />
+                            <div class="testimonial-item-shape">
+                                <span class="border-shadow shadow-1"></span>
+                                <span class="border-shadow shadow-2"></span>
+                            </div>
+                            <div class="box-shape pulse">
+                                <img src="../assets/images/shape/sec-shape5.svg" alt="Shape" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="tj-contact-box">
-                    <div class="form-input">
-                        <i class="flaticon-user"></i>
-                        <input class="input-fill" type="text" id="name" name="name" placeholder="Username or Email" required="" />
-                    </div>
-                    <div class="form-input">
-                        <i class="flaticon-objective"></i>
-                        <input class="input-fill" type="text" id="subject" name="subject" placeholder="Password" required="" />
-                    </div>
-                    
-                    <div class="tj-contact-button">
-                        <button class="tj-primary-btn contact-btn" type="submit" value="submit">
-                            Login to Account
-                        </button>
-                    </div>
+                <div class="col-lg-6">
+                    <?php if (!empty($error)): ?>
+                        <div style="background:red; margin-bottom:10px;color:white; padding:10px 20px">
+                            <?= $error ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($success)): ?>
+                        <div style="background:green; margin-bottom:10px;color:white; padding:10px 20px">
+                            <?= $success ?>
+                        </div>
+                    <?php endif; ?>
+                    <form method="POST" class="tj-contact-box">
+                        <div class="form-input">
+                            <i class="flaticon-user"></i>
+                            <input class="input-fill" type="text" name="login" placeholder="Username or Email" required />
+                        </div>
+
+                        <div class="form-input">
+                            <i class="flaticon-objective"></i>
+                            <input class="input-fill" type="text" name="password" placeholder="Password" required />
+                        </div>
+
+                        <div class="tj-contact-button">
+                            <button class="tj-primary-btn contact-btn" type="submit">
+                                Login to Account
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>
-    </div>
-    <div class="contact-bg-shape">
-        <img src="../assets/images/shape/sec-shape6.svg" alt="Shape" />
-    </div>
-    <div class="sec-overly-1">
-        <img src="../assets/images/shape/overly-1.svg" alt="Shape" />
-    </div>
-    <div class="sec-overly-2">
-        <img src="../assets/images/shape/overly-2.svg" alt="Shape" />
-    </div>
-    <div class="tj-circle-box3">
-        <span class="circle-1"></span>
-        <span class="circle-2"></span>
-        <span class="circle-3"></span>
-        <span class="circle-4"></span>
-    </div>
-</section>
+        <div class="contact-bg-shape">
+            <img src="../assets/images/shape/sec-shape6.svg" alt="Shape" />
+        </div>
+        <div class="sec-overly-1">
+            <img src="../assets/images/shape/overly-1.svg" alt="Shape" />
+        </div>
+        <div class="sec-overly-2">
+            <img src="../assets/images/shape/overly-2.svg" alt="Shape" />
+        </div>
+        <div class="tj-circle-box3">
+            <span class="circle-1"></span>
+            <span class="circle-2"></span>
+            <span class="circle-3"></span>
+            <span class="circle-4"></span>
+        </div>
+    </section>
 
 
     <!--========== Contact Section End ==============-->
 
 
 
-    <!--========== Footer Section Start ==============-->
-    <?php include('../include/footer.php') ?>
-    <!--========== Footer Section End ==============-->
 
     <!--========== Start scrollUp ==============-->
     <div class="saasify-scroll-top">

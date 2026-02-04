@@ -1,4 +1,58 @@
-<?php include('../server/connection.php') ?>
+<?php include('../server/connection.php');
+
+$success = "";
+$error = "";
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $name     = trim($_POST['name']);
+    $phone    = trim($_POST['phone']);
+    $email    = trim($_POST['email']);
+    $password = $_POST['password'];
+
+    // Basic validation
+    if (empty($name) || empty($phone) || empty($email) || empty($password)) {
+        $error = "All fields are required.";
+    } else {
+
+        // Hash password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        // Check if email already exists
+        $check = $connection->prepare("SELECT id FROM users WHERE email = ?");
+        $check->bind_param("s", $email);
+        $check->execute();
+        $check->store_result();
+
+        if ($check->num_rows > 0) {
+            $error = "Email already registered.";
+        } else {
+
+            // Insert user
+            $stmt = $connection->prepare(
+                "INSERT INTO users (full_name, phone, email, password) VALUES (?, ?, ?, ?)"
+            );
+            $stmt->bind_param("ssss", $name, $phone, $email, $hashedPassword);
+
+            if ($stmt->execute()) {
+                $success = "Account created successfully!";
+                echo "<script>
+                  setTimeout(()=>{
+                    window.location.href = '../login'
+                  },2000)
+                </script>";
+            } else {
+                $error = "Something went wrong. Please try again.";
+            }
+
+            $stmt->close();
+        }
+
+        $check->close();
+    }
+}
+?>
+
 
 <!DOCTYPE html>
 <html class="no-js" lang="en">
@@ -43,19 +97,7 @@
 <body>
     <div id="tj-overlay-bg2" class="tj-overlay-canvas"></div>
 
-    <!-- preloader -->
-    <div id="loading">
-        <div id="loading-center">
-            <div id="loading-center-absolute">
-                <div class="object" id="object_four"></div>
-                <div class="object-1" id="object_three"></div>
-                <div class="object-2" id="object_two"></div>
-                <div class="object-3" id="object_one"></div>
-            </div>
-            <button class="closeLoader tj-primary-black-btn"><span>Cancel Preloader</span></button>
-        </div>
-    </div>
-    <!-- end: Preloader -->
+   
 
     <!--========== Mobile Menu Start ==============-->
     <div class="tj-offcanvas-area">
@@ -103,7 +145,19 @@
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div class="tj-contact-box">
+                    <?php if (!empty($error)): ?>
+                        <div style="background:red; margin-bottom:10px;color:white; padding:10px 20px">
+                            <?= $error ?>
+                        </div>
+         <?php endif; ?>
+
+                    <?php if (!empty($success)): ?>
+                        <div style="background:green; margin-bottom:10px;color:white; padding:10px 20px">
+                            <?= $success ?>
+                        </div>
+         <?php endif; ?>
+
+                    <form method="POST" class="tj-contact-box">
                         <div class="form-input">
                             <i class="flaticon-user"></i>
                             <input class="input-fill" type="text" id="name" name="name" placeholder="Full Name" required="" />
@@ -120,13 +174,13 @@
                             <i class="flaticon-objective"></i>
                             <input class="input-fill" type="text" id="password" name="password" placeholder="Password" required="" />
                         </div>
-                        
+
                         <div class="tj-contact-button">
                             <button class="tj-primary-btn contact-btn" type="submit" value="submit">
                                 Create Account
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
