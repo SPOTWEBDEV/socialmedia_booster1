@@ -6,10 +6,10 @@
             class="block px-4 py-2 rounded bg-blue-50 text-blue-600 font-medium"
             >Dashboard</a
           >
-          <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100"
+          <a href="<?php echo $domain ?>user/deposit/" class="block px-4 py-2 rounded hover:bg-gray-100"
             >Deposit</a
           >
-          <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100"
+          <a href="<?php echo $domain ?>user/order/" class="block px-4 py-2 rounded hover:bg-gray-100"
             >Orders</a
           >
           <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100"

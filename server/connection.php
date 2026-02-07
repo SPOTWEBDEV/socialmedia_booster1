@@ -11,7 +11,7 @@ if ($isLocalhost) {
     define("USER", "root");
     define("PASSWORD", "");
     define("DATABASE", "boost");
-    $domain = "http://localhost/boostkore/";
+    $domain = "http://localhost/socialmedia_booster1/";
 } else {
     // Live
     define("USER", "boostkore_user");
@@ -33,3 +33,6 @@ $siteemail = "support@boostkore.com";
 $sitephone = "+44 776 0957 798";
 
 session_start();
+
+$projectID = '69875132aebfc2d5a7e9a1cc';
+$publicKey = 'pk_live-64e7b375350e4b519092237a4de9db2d';

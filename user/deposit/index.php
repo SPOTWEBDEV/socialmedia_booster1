@@ -71,73 +71,28 @@ include('../../server/auth/client.php')
 
             <!-- Dashboard Content -->
             <section class="p-2 sm:p-6 space-y-6 ">
-                <!-- Wallet Card -->
-                <div
-                    class="bg-blue-600 text-white rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="col-span-2">
-                        <p class="text-sm opacity-80">Wallet Balance</p>
-                        <h2 class="text-3xl font-bold">₦<?php echo number_format($balance, 2) ?></h2>
-                        <p class="text-sm opacity-80">$2.18</p>
-                    </div>
-                    <div
-                        class="flex items-center justify-between md:justify-end gap-2 sm:gap-4">
-                        <button
-                            class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
-                            <svg
-                                class="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                            Deposit
-                        </button>
-                        <button
-                            class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
-                            <svg
-                                class="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M4 7h16M4 17h16M10 3l-4 4 4 4M14 21l4-4-4-4" />
-                            </svg>
-                            Exchange
-                        </button>
-                    </div>
-                </div>
-
-
                 <section class="p-6 space-y-6">
                     <h2 class="text-xl font-semibold">Deposit Funds</h2>
 
-                   
+
                     <!-- Deposit Form -->
                     <div class="bg-white p-6 rounded-xl max-w-lg">
                         <h3 class="font-semibold mb-4">Make a Deposit</h3>
-                        <form class="space-y-4">
+
+                        <form id="depositForm" class="space-y-4">
                             <div>
-                                <label class="text-sm font-medium">Amount</label>
-                                <input type="number" placeholder="5000" class="w-full mt-1 border rounded-lg px-4 py-2" />
+                                <label class="text-sm font-medium">Amount (NGN)</label>
+                                <input type="number" id="depositAmount" placeholder="5000" min="100" required
+                                    class="w-full mt-1 border rounded-lg px-4 py-2" />
                             </div>
-                            <div>
-                                <label class="text-sm font-medium">Payment Method</label>
-                                <select class="w-full mt-1 border rounded-lg px-4 py-2">
-                                    <option>Bank Transfer</option>
-                                    <option>Card</option>
-                                    <option>Crypto</option>
-                                </select>
-                            </div>
-                            <button class="w-full bg-blue-600 text-white py-2 rounded-lg">Proceed</button>
+
+                            <button type="submit"
+                                class="w-full bg-blue-600 text-white py-2 rounded-lg">
+                                Pay with Etegram
+                            </button>
                         </form>
-                    </div>                
+                    </div>
+
 
                 </section>
             </section>
@@ -148,10 +103,42 @@ include('../../server/auth/client.php')
 
 
 
-
     <script>
-        lucide.createIcons();
+        let url = "<?php echo $domain ?>" + 'server/api/etegram-init.php'
+        document.getElementById("depositForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const amount = parseFloat(document.getElementById("depositAmount").value);
+            if (amount <= 0) {
+                alert("Enter a valid amount.");
+                return;
+            }
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    amount,
+                    user_id :"<?php echo $id ?>"
+                })
+            });
+
+            console.log(response)
+
+            const data = await response.json();
+
+            console.log(data)
+
+            if (data.status && data.authorization_url) {
+                window.location.href = data.authorization_url;
+            } else {
+                alert("Error initializing payment. Try again.");
+            }
+        });
     </script>
+
 </body>
 
 </html>
