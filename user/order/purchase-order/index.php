@@ -152,20 +152,7 @@ if (isset($_POST['send_message'])) {
         <!-- Main Content -->
         <main class="flex-1 ">
             <!-- Topbar -->
-            <header
-                class="bg-white border-b px-6 py-4 flex justify-between items-center">
-                <div>
-                    <p class="text-sm text-gray-500">Welcome back</p>
-                    <h1 class="text-xl font-semibold"><?php echo $fullname ?> 👋</h1>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button class="relative">
-                        <span
-                            class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        🔔
-                    </button>
-                </div>
-            </header>
+          <?php include('../../components/header.php') ?>
 
             <section class="p-6 space-y-6">
                 <h2 class="text-xl font-semibold">Boost Services</h2>

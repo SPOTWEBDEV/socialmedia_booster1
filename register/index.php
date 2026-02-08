@@ -1,7 +1,10 @@
-<?php include('../server/connection.php');
+<?php 
+include('../server/connection.php');
 
 $success = "";
 $error = "";
+
+$referral_code = trim($_GET['referral_code'] ?? ''); 
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -9,6 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $phone    = trim($_POST['phone']);
     $email    = trim($_POST['email']);
     $password = $_POST['password'];
+
 
     // Basic validation
     if (empty($name) || empty($phone) || empty($email) || empty($password)) {
@@ -28,19 +32,61 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $error = "Email already registered.";
         } else {
 
-            // Insert user
+            // Find referrer ID if referral code is provided
+            $referrer_id = null;
+            if(!empty($referral_code)){
+                $stmt_ref = $connection->prepare("SELECT id FROM users WHERE referral_code = ?");
+                $stmt_ref->bind_param("s", $referral_code);
+                $stmt_ref->execute();
+                $result_ref = $stmt_ref->get_result();
+                if($result_ref->num_rows > 0){
+                    $referrer_id = $result_ref->fetch_assoc()['id'];
+                }
+                $stmt_ref->close();
+            }
+
+            // Generate a unique referral code for the new user
+            function generateReferralCode($length = 6){
+                $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                $code = '';
+                for($i=0;$i<$length;$i++){
+                    $code .= $chars[random_int(0, strlen($chars)-1)];
+                }
+                return $code;
+            }
+            $new_referral_code = generateReferralCode();
+
+            // Insert new user
             $stmt = $connection->prepare(
-                "INSERT INTO users (full_name, phone, email, password) VALUES (?, ?, ?, ?)"
+                "INSERT INTO users (full_name, phone, email, password, referrer_id, referral_code) VALUES (?, ?, ?, ?, ?, ?)"
             );
-            $stmt->bind_param("ssss", $name, $phone, $email, $hashedPassword);
+            $stmt->bind_param("ssssss", $name, $phone, $email, $hashedPassword, $referrer_id, $new_referral_code);
 
             if ($stmt->execute()) {
+
+                // Credit referral bonus if there is a referrer
+                if($referrer_id){
+                    // Fetch referral bonus from admin table
+                    $bonusQuery = $connection->query("SELECT refferalbonus FROM admin LIMIT 1");
+                    $bonus = 0;
+                    if($bonusQuery && $bonusQuery->num_rows > 0){
+                        $bonus = $bonusQuery->fetch_assoc()['refferalbonus'];
+                    }
+
+                    // Update referrer's referral earnings
+                    $update = $connection->prepare("UPDATE users SET referral_earnings = referral_earnings + ? WHERE id = ?");
+                    $update->bind_param("di", $bonus, $referrer_id);
+                    $update->execute();
+                    $update->close();
+                }
+
                 $success = "Account created successfully!";
                 echo "<script>
                   setTimeout(()=>{
                     window.location.href = '../login'
                   },2000)
                 </script>";
+
             } else {
                 $error = "Something went wrong. Please try again.";
             }

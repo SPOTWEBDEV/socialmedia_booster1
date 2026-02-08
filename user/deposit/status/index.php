@@ -37,29 +37,29 @@ curl_close($ch);
 
 $responseText = trim($response);
 
+
 // -------------------------
 // MAP RESPONSE → STATUS
 // -------------------------
 if (stripos($responseText, 'already been processed') !== false) {
     $paymentStatus = 'approved';
 } elseif (stripos($responseText, "hasn't been recieved") !== false) {
-    $paymentStatus = 'declined';
-} else {
     $paymentStatus = 'pending';
+} else {
+    $paymentStatus = 'declined';
 }
 
-// -------------------------
-// UPDATE DATABASE SAFELY
-// -------------------------
+
+
+
+
 $stmt = $connection->prepare(
     "UPDATE deposit SET status = ? WHERE access_code = ? AND status = 'pending'"
 );
 $stmt->bind_param("ss", $paymentStatus, $accessCode);
 $stmt->execute();
 
-// -------------------------
-// FETCH DEPOSIT DETAILS
-// -------------------------
+
 $stmt = $connection->prepare(
     "SELECT d.user_id, d.amount, d.status, d.reference, u.full_name, u.email, u.phone
      FROM deposit d
@@ -180,9 +180,9 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
                 </div>
 
                 <!-- BUTTON -->
-                <a href="/dashboard"
+                <a href="<?php echo $domain ?>user/deposit/history"
                     class="mt-8 inline-block w-full text-white py-3 rounded-xl font-semibold transition <?= $btnColor ?>">
-                    Go to Dashboard
+                    Go to History
                 </a>
 
             </div>
