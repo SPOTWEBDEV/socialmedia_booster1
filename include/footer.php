@@ -31,35 +31,7 @@
                             <p class="desc">
                                 <?php echo $sitename ?> is a trusted social media boosting platform helping creators, influencers, and brands grow faster with real engagement.
                             </p>
-                            <div class="footer-social-list">
-                                <ul class="list-gap">
-                                    <li>
-                                        <a href="#"> <i class="fa-brands fa-linkedin-in"></i></a>
-                                    </li>
-                                    <li>
-                                        <a href="#"> <i class="fa-brands fa-facebook-f"></i></a>
-                                    </li>
-                                    <li>
-                                        <a href="#"> <i class="fa-brands fa-twitter"></i></a>
-                                    </li>
-                                    <li>
-                                        <a href="#"> <i class="fa-brands fa-instagram"></i></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-6 col-6">
-                        <div class="footer-widget footer1-col-2 widget_nav_menu">
-                            <h6 class="title">Company</h6>
-                            <div class="footer-menu-list">
-                                <ul>
-                                    <li><a href="#"> About Us</a></li>
-                                    <li><a href="#"> Contact Us</a></li>
-                                    <li><a href="#"> Careers</a></li>
-                                    <li><a href="#"> Blog</a></li>
-                                </ul>
-                            </div>
+                            
                         </div>
                     </div>
                     <div class="col-lg-2 col-md-6 col-sm-6 col-6">

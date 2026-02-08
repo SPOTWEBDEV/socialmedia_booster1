@@ -1,6 +1,94 @@
 <?php
 include('../../server/connection.php');
 include('../../server/auth/client.php');
+
+
+$userId = $id;
+$message = "";
+
+/* ---------------------------
+   HELPER: API KEY GENERATOR
+---------------------------- */
+function generateApiKey($type = 'live')
+{
+    return 'sk_' . $type . '_' . bin2hex(random_bytes(16));
+}
+
+/* ---------------------------
+   HANDLE FORM SUBMISSIONS
+---------------------------- */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    /* CHANGE PASSWORD */
+    if (isset($_POST['change_password'])) {
+
+        $current = $_POST['current_password'];
+        $new = $_POST['new_password'];
+        $confirm = $_POST['confirm_password'];
+
+        if ($new !== $confirm) {
+            $message = "Passwords do not match";
+        } else {
+            $stmt = $connection->prepare("SELECT password FROM users WHERE id=?");
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $stmt->bind_result($hashed);
+            $stmt->fetch();
+            $stmt->close();
+
+            if (!password_verify($current, $hashed)) {
+                $message = "Current password is incorrect";
+            } else {
+                $newHash = password_hash($new, PASSWORD_DEFAULT);
+                $up = $connection->prepare("UPDATE users SET password=? WHERE id=?");
+                $up->bind_param("si", $newHash, $userId);
+                $up->execute();
+                $message = "Password updated successfully";
+            }
+        }
+    }
+
+    /* NOTIFICATION SETTINGS */
+    if (isset($_POST['save_notifications'])) {
+        $email = isset($_POST['email_notifications']) ? 1 : 0;
+        $push  = isset($_POST['push_notifications']) ? 1 : 0;
+
+        $stmt = $connection->prepare("
+            UPDATE users 
+            SET email_notifications=?, push_notifications=? 
+            WHERE id=?
+        ");
+        $stmt->bind_param("iii", $email, $push, $userId);
+        $stmt->execute();
+        $message = "Notification settings saved";
+    }
+
+    /* API KEY GENERATION */
+    if (isset($_POST['generate_live'])) {
+        $key = generateApiKey('live');
+        $stmt = $connection->prepare("UPDATE users SET api_key_live=? WHERE id=?");
+        $stmt->bind_param("si", $key, $userId);
+        $stmt->execute();
+        $message = "Live API key generated";
+    }
+
+    if (isset($_POST['generate_test'])) {
+        $key = generateApiKey('test');
+        $stmt = $connection->prepare("UPDATE users SET api_key_test=? WHERE id=?");
+        $stmt->bind_param("si", $key, $userId);
+        $stmt->execute();
+        $message = "Test API key generated";
+    }
+}
+
+/* FETCH USER DATA */
+$user = mysqli_fetch_assoc(mysqli_query($connection, "
+    SELECT email_notifications, push_notifications, api_key_live, api_key_test 
+    FROM users WHERE id='$userId'
+"));
+
+
+
 ?>
 
 <!doctype html>
@@ -53,12 +141,18 @@ include('../../server/auth/client.php');
                     <p class="text-gray-500">Manage your account, change password and notifications.</p>
                 </div>
 
+                <?php if ($message): ?>
+                    <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg">
+                        <?php echo $message; ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <!-- Change Password Card -->
                     <div class="bg-white shadow rounded-lg p-6">
                         <h3 class="text-lg font-semibold mb-4">Change Password</h3>
-                        <form action="update_password.php" method="POST" class="space-y-4">
+                        <form method="POST" class="space-y-4">
                             <div>
                                 <label class="block text-gray-700 font-medium mb-1">Current Password</label>
                                 <input type="password" name="current_password" required
@@ -74,85 +168,58 @@ include('../../server/auth/client.php');
                                 <input type="password" name="confirm_password" required
                                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             </div>
-                            <button type="submit"
+                            <button type="submit" name="change_password"
                                 class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Update Password</button>
                         </form>
                     </div>
 
                     <!-- Notification Settings Card -->
-                    <div class="bg-white shadow rounded-lg p-6">
-                        <h3 class="text-lg font-semibold mb-4">Notification Settings</h3>
-                        <form action="update_notifications.php" method="POST" class="space-y-4">
-
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-gray-700 font-medium">Email Notifications</p>
-                                    <p class="text-gray-400 text-sm">Receive emails for account activity</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="email_notifications" class="sr-only peer" checked>
-                                    <div
-                                        class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
-                                    <span
-                                        class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition peer-checked:translate-x-5"></span>
-                                </label>
-                            </div>
-
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-gray-700 font-medium">Push Notifications</p>
-                                    <p class="text-gray-400 text-sm">Receive push notifications on your device</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="push_notifications" class="sr-only peer">
-                                    <div
-                                        class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
-                                    <span
-                                        class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition peer-checked:translate-x-5"></span>
-                                </label>
-                            </div>
-
-                            <button type="submit"
-                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Save Settings</button>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="font-semibold mb-4">Notifications</h3>
+                        <form method="POST" class="space-y-4">
+                            <label class="flex justify-between items-center">
+                                <span>Email Notifications</span>
+                                <input type="checkbox" name="email_notifications" <?php if ($user['email_notifications']) echo 'checked'; ?>>
+                            </label>
+                            <label class="flex justify-between items-center">
+                                <span>Push Notifications</span>
+                                <input type="checkbox" name="push_notifications" <?php if ($user['push_notifications']) echo 'checked'; ?>>
+                            </label>
+                            <button name="save_notifications" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                                Save
+                            </button>
                         </form>
                     </div>
 
-                    <!-- Other Settings Card (Optional) -->
-                    <div class="bg-white shadow rounded-lg p-6 md:col-span-2">
-                        <h3 class="text-lg font-semibold mb-4">Other Preferences</h3>
-                        <form action="update_preferences.php" method="POST" class="space-y-4">
 
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-gray-700 font-medium">Dark Mode</p>
-                                    <p class="text-gray-400 text-sm">Enable dark theme for the dashboard</p>
+                    <div class="bg-white rounded-xl shadow p-6 lg:col-span-2">
+                        <h3 class="font-semibold mb-4">API Keys</h3>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm">Live API Key</label>
+                                <div class="flex gap-2">
+                                    <input readonly value="<?php echo $user['api_key_live'] ?? 'Not generated'; ?>" class="flex-1 px-3 py-2 border rounded-lg bg-gray-100 text-sm">
+                                    <button name="generate_live" formmethod="POST" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                                        Generate
+                                    </button>
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="dark_mode" class="sr-only peer">
-                                    <div
-                                        class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
-                                    <span
-                                        class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition peer-checked:translate-x-5"></span>
-                                </label>
                             </div>
 
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-gray-700 font-medium">Marketing Emails</p>
-                                    <p class="text-gray-400 text-sm">Receive promotional emails</p>
+                            <div>
+                                <label class="text-sm">Test API Key</label>
+                                <div class="flex gap-2">
+                                    <input readonly value="<?php echo $user['api_key_test'] ?? 'Not generated'; ?>" class="flex-1 px-3 py-2 border rounded-lg bg-gray-100 text-sm">
+                                    <button name="generate_test" formmethod="POST" class="bg-gray-800 text-white px-4 py-2 rounded-lg">
+                                        Generate
+                                    </button>
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="marketing_emails" class="sr-only peer" checked>
-                                    <div
-                                        class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
-                                    <span
-                                        class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform transition peer-checked:translate-x-5"></span>
-                                </label>
                             </div>
 
-                            <button type="submit"
-                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Save Preferences</button>
-                        </form>
+                            <a href="/docs/api" class="text-blue-600 font-medium inline-flex items-center gap-2">
+                                <i class="bi bi-book"></i> API Documentation
+                            </a>
+                        </div>
                     </div>
 
                 </div>

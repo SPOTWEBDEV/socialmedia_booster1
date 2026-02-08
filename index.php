@@ -13,13 +13,14 @@ include('./server/connection.php');
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="" />
+    <meta name="description" content="Boost Your Social Media Growth with Boostkore" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Site Title -->
-    <title>Saasify - Startup & SaaS Landing Page HTML Template</title>
+    <title><?php echo $sitename ?></title>
     <!-- Favicon -->
-    <link rel="apple-touch-icon" href="assets/images/fav.svg" />
-    <link rel="shortcut icon" type="image/x-icon" href="assets/images/fav.svg" />
+    <link rel="apple-touch-icon" href="assets/images/logo/logo.png" />
+    <link rel="shortcut icon" type="image/x-icon" href="assets/images/logo/logo.png" />
 
     <!-- Bootstrap css -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
@@ -48,19 +49,7 @@ include('./server/connection.php');
 <body>
     <div id="tj-overlay-bg2" class="tj-overlay-canvas"></div>
 
-    <!-- preloader -->
-    <div id="loading">
-        <div id="loading-center">
-            <div id="loading-center-absolute">
-                <div class="object" id="object_four"></div>
-                <div class="object-1" id="object_three"></div>
-                <div class="object-2" id="object_two"></div>
-                <div class="object-3" id="object_one"></div>
-            </div>
-            <button class="closeLoader tj-primary-black-btn"><span>Cancel Preloader</span></button>
-        </div>
-    </div>
-    <!-- end: Preloader -->
+    
 
     <!--========== Mobile Menu Start ==============-->
     <div class="tj-offcanvas-area">
@@ -86,7 +75,7 @@ include('./server/connection.php');
     <!--========== Header Section End ==============-->
 
     <!--========== Slider Section Start ==============-->
-    <section class="tj-slider-section" data-bg-image="assets/images/banner/bg-group5.svg">
+    <section id="home" class="tj-slider-section" data-bg-image="assets/images/banner/bg-group5.svg">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-lg-7">
@@ -106,8 +95,8 @@ include('./server/connection.php');
                 </div>
                 <div class="col-lg-5">
                     <div class="slider-box">
-                        <span class="active-text">
-                            <i class="fa-light fa-check"></i> Boost successfully applied!
+                        <span class="active-text bg-white">
+                            <i class="fa-light fa-check"></i> <?php echo $sitename ?> is one of the best in boosting social media account
                         </span>
                         <div class="slider-area">
                             <div class="swiper tj-banner-slider">
@@ -218,7 +207,7 @@ include('./server/connection.php');
 
 
     <!--========== Feature Section Start ==============-->
-    <section class="feature-section-two">
+    <section id="features" class="feature-section-two">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-7">
@@ -310,13 +299,12 @@ include('./server/connection.php');
                     </div>
                 </div>
                 <div class="col-lg-5">
-                    <div class="feature-geroup-image">
-                        <div class="feature-text"><i class="flaticon-checkmark"></i> Launch Boost Campaign</div>
-                        <div class="feature-text-two"><i class="flaticon-checkmark"></i> Track Growth</div>
-                        <img class="image-1 shake-y" src="assets/images/feature/feature-1.png" alt="Image" />
-                        <img class="image-2 pulse" src="assets/images/feature/feature-2.png" alt="Image" />
-                        <img class="image-3 pulse" src="assets/images/feature/feature-3.png" alt="Image" />
-                    </div>
+                    <img class="image-1 shake-y" src="assets/images/feature/team1.png" alt="Image" />
+                    <!-- <div class="feature-geroup-image">
+                        
+                        <img class="image-1 shake-y" src="assets/images/feature/team1.png" alt="Image" />
+                        
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -330,7 +318,7 @@ include('./server/connection.php');
     <!--========== Feature Section End ==============-->
 
     <!--========== Solution Section Start ==============-->
-    <section class="tj-solution-section">
+    <section id="about" class="tj-solution-section">
         <div class="container">
             <div class="row">
                 <div class="col-lg-7">
@@ -351,7 +339,7 @@ include('./server/connection.php');
                                 </ul>
                             </div>
                             <div class="tj-solution-button">
-                                <a class="tj-primary-btn" href="contact.html"> Start Boosting Free</a>
+                                <a class="tj-primary-btn" href="./register/"> Start Boosting Free</a>
                             </div>
                         </div>
                     </div>
@@ -359,9 +347,9 @@ include('./server/connection.php');
                 <div class="col-lg-5">
                     <div class="solution-group-image">
                         <img class="image-1 shake-y" src="assets/images/feature/solution-1.png" alt="Image" />
-                        <img class="image-2 pulse" src="assets/images/feature/solution-2.png" alt="Image" />
-                        <img class="image-3 pulse" src="assets/images/feature/solution-3.png" alt="Image" />
-                        <img class="image-4 pulse" src="assets/images/feature/solution-4.png" alt="Image" />
+                       
+                       
+                      
                         <img class="image-5 pulse" src="assets/images/shape/sec-shape12.svg" alt="Image" />
                     </div>
                 </div>
@@ -408,7 +396,7 @@ include('./server/connection.php');
                                 </ul>
                             </div>
                             <div class="tj-collaboration-button">
-                                <a class="tj-primary-btn" href="contact.html"> Learn More</a>
+                                <a class="tj-primary-btn" href="./register/"> Learn More</a>
                             </div>
                         </div>
                     </div>
@@ -419,7 +407,7 @@ include('./server/connection.php');
             </div>
         </div>
         <div class="collaboration-bg-image">
-            <img src="assets/images/banner/bg-2.png" alt="Image" />
+            <img src="assets/images/feature/boostkore.png" alt="Image" />
         </div>
         <div class="tj-circle-box-one-2">
             <span class="circle_1"></span>
@@ -454,9 +442,7 @@ include('./server/connection.php');
                     <div class="testimonial-slider-item">
                         <div class="testimonial-content-box">
                             <div class="testimonial-top-header">
-                                <div class="testimonial-image">
-                                    <img src="assets/images/testimonial/test-2.png" alt="Image" />
-                                </div>
+                               
                                 <div class="testimonial-auother">
                                     <h6 class="title">Peter Buckland</h6>
                                     <span> Digital Marketer</span>
@@ -484,9 +470,7 @@ include('./server/connection.php');
                     <div class="testimonial-slider-item">
                         <div class="testimonial-content-box">
                             <div class="testimonial-top-header">
-                                <div class="testimonial-image">
-                                    <img src="assets/images/testimonial/test-3.png" alt="Image" />
-                                </div>
+                                
                                 <div class="testimonial-auother">
                                     <h6 class="title">Joseph Manning</h6>
                                     <span> Content Creator</span>
@@ -514,9 +498,7 @@ include('./server/connection.php');
                     <div class="testimonial-slider-item">
                         <div class="testimonial-content-box">
                             <div class="testimonial-top-header">
-                                <div class="testimonial-image">
-                                    <img src="assets/images/testimonial/test-4.png" alt="Image" />
-                                </div>
+                                
                                 <div class="testimonial-auother">
                                     <h6 class="title">Dylan Hodges</h6>
                                     <span> Brand Owner</span>
@@ -561,14 +543,14 @@ include('./server/connection.php');
                                 <?php echo $sitename ?> gives you full control over your social media growth. Monitor campaign status, track engagement, and manage multiple platforms seamlessly from a single dashboard.
                             </p>
                             <div class="tj-communication-button">
-                                <a class="tj-black-btn" href="contact.html"> Start Boosting Free</a>
+                                <a class="tj-black-btn" href="./register/"> Start Boosting Free</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="communication-image shake-y">
-                        <img src="assets/images/feature/communication.png" alt="Image" />
+                        <img src="assets/images/feature/boostkore1.png" alt="Image" />
                     </div>
                 </div>
             </div>

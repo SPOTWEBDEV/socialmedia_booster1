@@ -1,8 +1,28 @@
 <?php
 include('../../server/connection.php');
-include('../../server/auth/client.php')
+include('../../server/auth/client.php');
 
 
+
+// Handle search and status filter
+$search = $_GET['search'] ?? '';
+$statusFilter = $_GET['status'] ?? '';
+
+// Build the query dynamically
+$query = "SELECT `id`, `user_id`, `reference`, `access_code`, `amount`, `status`, `created_at` FROM `deposit` WHERE 1";
+
+if ($statusFilter !== '' && $statusFilter !== 'all') {
+    $query .= " AND `status` = '" . mysqli_real_escape_string($connection, $statusFilter) . "'";
+}
+
+if ($search !== '') {
+    $search = mysqli_real_escape_string($connection, $search);
+    $query .= " AND (`reference` LIKE '%$search%' OR `user_id` LIKE '%$search%')";
+}
+
+$query .= " ORDER BY `created_at` DESC";
+
+$result = mysqli_query($connection, $query);
 
 ?>
 
@@ -103,154 +123,112 @@ include('../../server/auth/client.php')
                     d="M4 7h16M4 17h16M10 3l-4 4 4 4M14 21l4-4-4-4"
                   />
                 </svg>
-                Exchange
+                Order
               </button>
             </div>
           </div>
 
-          <div>
-            <h3 class="text-lg font-semibold mb-4">Services</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div
-                class="bg-white p-6 rounded-xl shadow-sm hover:shadow transition flex items-center gap-4"
-              >
-                <div
-                  class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect x="7" y="2" width="10" height="20" rx="2" ry="2" />
-                    <path d="M11 18h2" />
-                  </svg>
-                </div>
-                <span class="font-medium">Airtime</span>
-              </div>
-              <div
-                class="bg-white p-6 rounded-xl shadow-sm hover:shadow transition flex items-center gap-4"
-              >
-                <div
-                  class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
-                    <path d="M2 7h20v5H2z" />
-                    <path d="M12 22V7" />
-                    <path d="M12 7a3 3 0 1 0-3-3" />
-                    <path d="M12 7a3 3 0 1 1 3-3" />
-                  </svg>
-                </div>
-                <span class="font-medium">Gift Card</span>
-              </div>
-              <div
-                class="bg-white p-6 rounded-xl shadow-sm hover:shadow transition flex items-center gap-4"
-              >
-                <div
-                  class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect x="2" y="5" width="20" height="14" rx="2" />
-                    <path d="M2 10h20" />
-                  </svg>
-                </div>
-                <span class="font-medium">Virtual Card</span>
-              </div>
-              <div
-                class="bg-white p-6 rounded-xl shadow-sm hover:shadow transition flex items-center gap-4"
-              >
-                <div
-                  class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 1v22" />
-                    <path d="M17 5H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H7" />
-                  </svg>
-                </div>
-                <span class="font-medium">Crypto</span>
-              </div>
-            </div>
-          </div>
+         
+          <section class="p-6 space-y-6 bg-white rounded-xl">
+                <h2 class="text-xl font-semibold">Deposit History</h2>
 
-          <div class="bg-white rounded-xl p-6 " style="margin-bottom: 40px;">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-semibold">Recent Orders</h3>
-              <a href="#" class="text-blue-600 text-sm">View All</a>
-            </div>
+                <!-- Filters -->
+                <div class=" p-4  flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+                    <form method="GET" class="flex gap-3">
+                        <select id="status" class="border rounded-lg px-3 py-2 text-sm">
+                            <option value="all" <?= $statusFilter === 'all' ? 'selected' : '' ?>>All Status</option>
+                            <option value="Completed" <?= $statusFilter === 'Completed' ? 'selected' : '' ?>>Completed</option>
+                            <option value="Processing" <?= $statusFilter === 'Processing' ? 'selected' : '' ?>>Processing</option>
+                            <option value="Pending" <?= $statusFilter === 'Pending' ? 'selected' : '' ?>>Pending</option>
+                            <option value="Failed" <?= $statusFilter === 'Failed' ? 'selected' : '' ?>>Failed</option>
+                        </select>
+                        <input
+                            id="searchInput"
+                            type="search"
+                            name="search"
+                            value="<?= htmlspecialchars($search) ?>"
+                            placeholder="Search by reference or user ID"
+                            class="border rounded-lg px-4 py-2 text-sm w-full md:w-64" />
 
-            <div class="hidden md:block">
-              <table class="w-full text-sm">
-                <thead class="text-left text-gray-500">
-                  <tr>
-                    <th class="py-2">Service</th>
-                    <th>Status</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y">
-                  <tr class="hover:bg-gray-50">
-                    <td class="py-3">Instagram Boost</td>
-                    <td class="text-green-600">Completed</td>
-                    <td>₦1,500</td>
-                    <td>02 Feb 2026</td>
-                    <td><a href="#" class="text-blue-600">View</a></td>
-                  </tr>
-                  <tr class="hover:bg-gray-50">
-                    <td class="py-3">TikTok Likes</td>
-                    <td class="text-yellow-600">Processing</td>
-                    <td>₦800</td>
-                    <td>01 Feb 2026</td>
-                    <td><a href="#" class="text-blue-600">View</a></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
 
-            <div class="space-y-4 md:hidden">
-              <div class="border rounded-lg p-4">
-                <div class="flex justify-between items-center">
-                  <span class="font-medium">Instagram Boost</span>
-                  <span class="text-green-600 text-sm">Completed</span>
+
+                        <button type="submit"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Filter</button>
+                    </form>
                 </div>
-                <div class="mt-2 text-sm text-gray-500">Amount: ₦1,500</div>
-                <div class="text-sm text-gray-500">Date: 02 Feb 2026</div>
-                <a href="#" class="inline-block mt-2 text-blue-600 text-sm"
-                  >View Order</a
-                >
-              </div>
 
-              <div class="border rounded-lg p-4">
-                <div class="flex justify-between items-center">
-                  <span class="font-medium">TikTok Likes</span>
-                  <span class="text-yellow-600 text-sm">Processing</span>
+                <div class="bg-white p-4 rounded-xl ">
+
+                 <!-- Desktop Table -->
+                <div class="hidden md:block">
+                    <table class="w-full text-sm">
+                        <thead class="text-left text-gray-500">
+                            <tr>
+                                <th class="py-2">Reference</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <?php if (mysqli_num_rows($result) > 0): ?>
+                                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="py-3"><?= htmlspecialchars($row['reference']) ?></td>
+
+                                        <td class="<?= $row['status'] === 'approved' ? 'text-green-600' : ($row['status'] === 'Processing' ? 'text-yellow-600' : 'text-red-600') ?>">
+                                            <?= $row['status'] ?>
+                                        </td>
+                                        <td>₦<?= number_format($row['amount']) ?></td>
+                                        <td><?= date('d M Y', strtotime($row['created_at'])) ?></td>
+
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-gray-400">No deposits found</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="mt-2 text-sm text-gray-500">Amount: ₦800</div>
-                <div class="text-sm text-gray-500">Date: 01 Feb 2026</div>
-                <a href="#" class="inline-block mt-2 text-blue-600 text-sm"
-                  >View Order</a
-                >
-              </div>
-            </div>
-          </div>
+
+                <!-- Mobile Vertical Orders -->
+                <div class="space-y-4 md:hidden">
+                    <?php if (mysqli_num_rows($result) > 0): ?>
+                        <?php mysqli_data_seek($result, 0); // Reset result pointer for mobile 
+                        ?>
+                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium"><?= htmlspecialchars($row['reference']) ?></span>
+                                    <span class="<?= $row['status'] === 'Completed' ? 'text-green-600' : ($row['status'] === 'Processing' ? 'text-yellow-600' : 'text-red-600') ?> text-sm">
+                                        <?= $row['status'] ?>
+                                    </span>
+                                </div>
+
+                                <div class="mt-1 text-sm text-gray-500">Amount: ₦<?= number_format($row['amount']) ?></div>
+                                <div class="text-sm text-gray-500">Date: <?= date('d M Y', strtotime($row['created_at'])) ?></div>
+
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="text-center text-gray-400 py-4">No deposits found</div>
+                    <?php endif; ?>
+                </div>
+                </div>
+
+               
+
+
+
+
+
+
+
+
+            </section>
         </section>
       </main>
     </div>
