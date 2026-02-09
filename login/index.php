@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 echo "<script>
                   setTimeout(()=>{
                     window.location.href = '../user/dashboard/'
-                  },2000)
+                  },1000)
                 </script>";
             } else {
                 $error = "Invalid login details.";

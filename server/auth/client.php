@@ -23,6 +23,8 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != "") {
             $status           = sanitize($row['status']);
             $status_message   = sanitize($row['status_message'], '');
             $balance = $row['balance'];
+            $country = $row['country'];
+            $currency = $row['currency'];
         }
     } else {
         echo "<script>window.open('$url', '_self');</script>";

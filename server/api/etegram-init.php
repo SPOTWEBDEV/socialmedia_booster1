@@ -55,7 +55,8 @@ $data = json_encode([
     "phone"        => $user['phone'],
     "firstname"    => $user['full_name'],
     "reference"    => $reference,
-    "callback_url" => $callback_url   // ✅ send callback URL to Etegram
+    "callback_url" => $callback_url, 
+    "currency"     => 'USD'
 ]);
 
 $ch = curl_init();

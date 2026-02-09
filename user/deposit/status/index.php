@@ -49,19 +49,11 @@ if (stripos($responseText, 'already been processed') !== false) {
     $paymentStatus = 'declined';
 }
 
-
-
-
-
+// -------------------------
+// FETCH DEPOSIT DETAILS
+// -------------------------
 $stmt = $connection->prepare(
-    "UPDATE deposit SET status = ? WHERE access_code = ? AND status = 'pending'"
-);
-$stmt->bind_param("ss", $paymentStatus, $accessCode);
-$stmt->execute();
-
-
-$stmt = $connection->prepare(
-    "SELECT d.user_id, d.amount, d.status, d.reference, u.full_name, u.email, u.phone
+    "SELECT d.user_id, d.amount, d.status, d.reference, u.full_name, u.email, u.phone, u.balance
      FROM deposit d
      JOIN users u ON d.user_id = u.id
      WHERE d.access_code = ?"
@@ -69,6 +61,31 @@ $stmt = $connection->prepare(
 $stmt->bind_param("s", $accessCode);
 $stmt->execute();
 $deposit = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+// -------------------------
+// UPDATE DEPOSIT STATUS
+// -------------------------
+if ($deposit && $deposit['status'] === 'pending') {
+    $stmt = $connection->prepare(
+        "UPDATE deposit SET status = ? WHERE access_code = ? AND status = 'pending'"
+    );
+    $stmt->bind_param("ss", $paymentStatus, $accessCode);
+    $stmt->execute();
+    $stmt->close();
+
+    // -------------------------
+    // CREDIT USER BALANCE IF APPROVED
+    // -------------------------
+    if ($paymentStatus === 'approved') {
+        $newBalance = $deposit['balance'] + $deposit['amount'];
+        $stmt = $connection->prepare("UPDATE users SET balance = ? WHERE id = ?");
+        $stmt->bind_param("di", $newBalance, $deposit['user_id']);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
 
 // UI VARIABLES
 $isSuccess = $paymentStatus === 'approved';
@@ -87,116 +104,126 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
     <title>Deposit Status</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 font-inter">
+<body class="bg-gray-100 ">
 
-
-
-    <!-- Layout Wrapper -->
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <?php include('../../components/sidebar.php') ?>
 
         <!-- Main Content -->
-        <main class="flex-1 ">
+        <main class="flex-1 flex flex-col">
             <!-- Topbar -->
-            <header
-                class="bg-white border-b px-6 py-4 flex justify-between items-center">
-                <div>
-                    <p class="text-sm text-gray-500">Welcome back</p>
-                    <h1 class="text-xl font-semibold"><?php echo $fullname ?> 👋</h1>
+            <?php include('../../components/header.php') ?>
+
+            <!-- Page Content -->
+            <section class="flex-1 flex items-center justify-center px-4 py-10">
+
+                <!-- Status Card -->
+                <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
+
+                    <!-- Status Icon -->
+                    <div class="mx-auto mb-6 w-20 h-20 rounded-full flex items-center justify-center <?= $iconBg ?>">
+                        <?php if ($isSuccess): ?>
+                            <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        <?php elseif ($paymentStatus === 'declined'): ?>
+                            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        <?php else: ?>
+                            <svg class="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
+                            </svg>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="text-2xl font-bold <?= $textColor ?>">
+                        <?= $title ?>
+                    </h1>
+
+                    <!-- Description -->
+                    <p class="text-gray-500 mt-2 text-sm leading-relaxed">
+                        <?php if ($isSuccess): ?>
+                            Your deposit has been successfully processed and credited to your account.
+                        <?php elseif ($paymentStatus === 'declined'): ?>
+                            Your payment was unsuccessful. Please try again or contact support.
+                        <?php else: ?>
+                            Your payment is currently being processed. This may take a few minutes.
+                        <?php endif; ?>
+                    </p>
+
+                    <!-- Divider -->
+                    <div class="my-6 border-t"></div>
+
+                    <!-- Transaction Details -->
+                    <div class="bg-gray-50 rounded-xl p-4 text-sm text-left space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Reference</span>
+                            <span class="font-medium text-gray-800">
+                                <?= htmlspecialchars($deposit['reference']) ?>
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Status</span>
+                            <span class="font-semibold <?= $textColor ?>">
+                                <?= ucfirst($deposit['status']) ?>
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Amount</span>
+                            <span class="font-semibold text-gray-800">
+                                ₦<?= number_format($deposit['amount'], 2) ?>
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Name</span>
+                            <span class="text-gray-800">
+                                <?= htmlspecialchars($deposit['full_name']) ?>
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Email</span>
+                            <span class="text-gray-800 truncate">
+                                <?= htmlspecialchars($deposit['email']) ?>
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Phone</span>
+                            <span class="text-gray-800">
+                                <?= htmlspecialchars($deposit['phone']) ?>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <a href="<?= $domain ?>user/deposit/history"
+                        class="mt-8 inline-flex items-center justify-center w-full py-3 rounded-xl font-semibold text-white transition <?= $btnColor ?>">
+                        View Deposit History
+                    </a>
+
                 </div>
-                <div class="flex items-center gap-4">
-                    <button class="relative">
-                        <span
-                            class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        🔔
-                    </button>
-                </div>
-            </header>
-
-            <div class="bg-white shadow-xl w-[90%] sm:w-[400px] rounded-2xl p-8 text-center">
-
-                <!-- ICON -->
-                <div class="mx-auto mb-6 w-24 h-24 rounded-full flex items-center justify-center <?= $iconBg ?>">
-                    <?php if ($isSuccess): ?>
-                        <svg class="w-14 h-14 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M5 13l4 4L19 7" />
-                        </svg>
-                    <?php elseif ($paymentStatus === 'declined'): ?>
-                        <svg class="w-14 h-14 text-red-600" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    <?php else: ?>
-                        <svg class="w-14 h-14 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 8v4l3 3" />
-                        </svg>
-                    <?php endif; ?>
-                </div>
-
-                <!-- TITLE -->
-                <h1 class="text-2xl font-bold <?= $textColor ?>">
-                    <?= $title ?>
-                </h1>
-
-                <!-- MESSAGE -->
-                <p class="text-gray-600 mt-3">
-                    <?= $isSuccess ? "Your deposit has been successfully processed and credited." : ($paymentStatus === 'declined' ? "Your payment could not be completed. Please try again." : "Your payment is pending.") ?>
-                </p>
-
-                <!-- DETAILS CARD -->
-                <div class="mt-6 bg-gray-50 rounded-xl p-4 text-sm text-left space-y-2">
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Reference</span>
-                        <span class="font-medium"><?= htmlspecialchars($deposit['reference']) ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Status</span>
-                        <span class="font-semibold <?= $textColor ?>"><?= ucfirst($deposit['status']) ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Amount</span>
-                        <span class="font-medium">₦<?= number_format($deposit['amount'], 2) ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Name</span>
-                        <span class="font-medium"><?= htmlspecialchars($deposit['full_name']) ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Email</span>
-                        <span class="font-medium"><?= htmlspecialchars($deposit['email']) ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Phone</span>
-                        <span class="font-medium"><?= htmlspecialchars($deposit['phone']) ?></span>
-                    </div>
-                </div>
-
-                <!-- BUTTON -->
-                <a href="<?php echo $domain ?>user/deposit/history"
-                    class="mt-8 inline-block w-full text-white py-3 rounded-xl font-semibold transition <?= $btnColor ?>">
-                    Go to History
-                </a>
-
-            </div>
+            </section>
         </main>
     </div>
 
     <?php include('../../components/bottomnav.php') ?>
 
-
-
-
-
-
-
 </body>
+
 
 </html>

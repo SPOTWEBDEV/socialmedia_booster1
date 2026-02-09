@@ -7,8 +7,8 @@ $currentPath = $_SERVER['REQUEST_URI'];
 <aside class="w-64 bg-white border-r hidden md:flex flex-col shadow-lg">
     <!-- Logo / Brand -->
     <div class="p-6 flex items-center gap-2 border-b">
-        <i class="bi bi-lightning-charge-fill text-3xl bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"></i>
-        <span class="text-xl font-bold text-blue-600">BoostPanel</span>
+       
+        <img style="width: 120px;" src="<?php echo $domain ?>assets/images/logo/logo.png" alt="">
     </div>
 
     <!-- Navigation -->

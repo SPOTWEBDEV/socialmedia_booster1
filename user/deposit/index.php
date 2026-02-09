@@ -59,7 +59,13 @@ include('../../server/auth/client.php')
             <!-- Dashboard Content -->
             <section class="p-2 sm:p-6 space-y-6 ">
                 <section class="p-2 space-y-6">
-                    <h2 class="text-xl font-semibold">Deposit Funds</h2>
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Deposit Funds</h2>
+                        <button onclick="window.location.href='./history'" type="submit"
+                            class="w-fit px-4 border-2 text-black border-blue-600  py-2 rounded-lg">
+                            Deposit History
+                        </button>
+                    </div>
 
 
                     <!-- Deposit Form -->
@@ -68,10 +74,15 @@ include('../../server/auth/client.php')
 
                         <form id="depositForm" class="space-y-4">
                             <div>
-                                <label class="text-sm font-medium">Amount (NGN)</label>
-                                <input type="number" id="depositAmount" placeholder="5000" min="100" required
+                                <label class="text-sm font-medium">Amount </label>
+                                <input type="number" id="depositAmount" placeholder="5000" required
                                     class="w-full mt-1 border rounded-lg px-4 py-2" />
                             </div>
+                            <!-- <div>
+                                <label class="text-sm font-medium">Currency</label>
+                                <input type="text" readonly id="depositAmount" placeholder="<?php echo $currency ?>" value="<?php echo $currency ?>" required
+                                    class="w-full mt-1 border rounded-lg px-4 py-2" />
+                            </div> -->
 
                             <button type="submit"
                                 class="w-full bg-blue-600 text-white py-2 rounded-lg">
@@ -108,7 +119,7 @@ include('../../server/auth/client.php')
                 },
                 body: JSON.stringify({
                     amount,
-                    user_id :"<?php echo $id ?>"
+                    user_id: "<?php echo $id ?>"
                 })
             });
 

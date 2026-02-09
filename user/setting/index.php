@@ -81,10 +81,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+/* USER PREFERENCES */
+if (isset($_POST['save_preferences'])) {
+
+    $country  = $_POST['country'];
+    $currency = $_POST['currency'];
+
+    $stmt = $connection->prepare("
+        UPDATE users 
+        SET country=?, currency=? 
+        WHERE id=?
+    ");
+    $stmt->bind_param("ssi", $country, $currency, $userId);
+    $stmt->execute();
+
+    $message = "Preferences updated successfully";
+}
+
+
 /* FETCH USER DATA */
-$user = mysqli_fetch_assoc(mysqli_query($connection, "
-    SELECT email_notifications, push_notifications, api_key_live, api_key_test 
-    FROM users WHERE id='$userId'
+$user = mysqli_fetch_assoc(mysqli_query($connection, "SELECT 
+    email_notifications, 
+    push_notifications, 
+    api_key_live, 
+    api_key_test,
+    country,
+    currency
+FROM users 
+WHERE id='$userId'
 "));
 
 
@@ -190,6 +214,48 @@ $user = mysqli_fetch_assoc(mysqli_query($connection, "
                             </button>
                         </form>
                     </div>
+
+                    <!-- Preferences Card -->
+                    <!-- <div class="bg-white rounded-xl shadow p-6">
+    <h3 class="font-semibold mb-4">Preferences</h3>
+
+    <form method="POST" class="space-y-4">
+
+      
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Country
+            </label>
+            <select name="country" required
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select country</option>
+                <option value="NG" <?= ($user['country'] ?? '') === 'NG' ? 'selected' : '' ?>>Nigeria</option>
+                <option value="GH" <?= ($user['country'] ?? '') === 'GH' ? 'selected' : '' ?>>Ghana</option>
+                <option value="US" <?= ($user['country'] ?? '') === 'US' ? 'selected' : '' ?>>United States</option>
+            </select>
+        </div>
+
+       
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Currency
+            </label>
+            <select name="currency" required
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select currency</option>
+                <option value="NGN" <?= ($user['currency'] ?? '') === 'NGN' ? 'selected' : '' ?>>₦ NGN</option>
+                <option value="GHS" <?= ($user['currency'] ?? '') === 'GHS' ? 'selected' : '' ?>>₵ GHS</option>
+                <option value="USD" <?= ($user['currency'] ?? '') === 'USD' ? 'selected' : '' ?>>$ USD</option>
+            </select>
+        </div>
+
+        <button name="save_preferences"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            Save Preferences
+        </button>
+    </form>
+</div> -->
+
 
 
                     <div class="bg-white rounded-xl shadow p-6 lg:col-span-2">

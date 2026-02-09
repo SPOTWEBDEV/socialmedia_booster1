@@ -58,9 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             // Insert new user
             $stmt = $connection->prepare(
-                "INSERT INTO users (full_name, phone, email, password, referrer_id, referral_code) VALUES (?, ?, ?, ?, ?, ?)"
+                "INSERT INTO users (full_name, phone, email, password, referrer_id, referral_code , country , currency) VALUES (?, ?, ?, ?, ?, ? , ? , ?)"
             );
-            $stmt->bind_param("ssssss", $name, $phone, $email, $hashedPassword, $referrer_id, $new_referral_code);
+            $stmt->bind_param("ssssssss", $name, $phone, $email, $hashedPassword, $referrer_id, $new_referral_code , 'NG' , 'NGN');
 
             if ($stmt->execute()) {
 

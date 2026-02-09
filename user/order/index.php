@@ -67,7 +67,15 @@ include('../../server/auth/client.php')
 
       <!-- Dashboard Content -->
       <section class="p-6 space-y-6">
-        <h2 class="text-xl font-semibold">Boost Services</h2>
+       
+
+        <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Boost Services</h2>
+                        <button onclick="window.location.href='../order'" type="submit"
+                            class="w-fit px-4 border-2 text-black border-blue-600 hover:bg-blue-600 hover:text-white  py-2 rounded-lg">
+                            Order History
+                        </button>
+                    </div>
 
         <!-- Filters -->
         <div class="bg-white p-4 rounded-xl flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
