@@ -14,9 +14,9 @@ if ($isLocalhost) {
     $domain = "http://localhost/socialmedia_booster1/";
 } else {
     // Live
-    define("USER", "boostkore_user");
-    define("PASSWORD", "boostkore_password");
-    define("DATABASE", "boostkore_db");
+    define("USER", "boostkor_db");
+    define("PASSWORD", "boostkor_db");
+    define("DATABASE", "boostkor_db");
     $domain = "https://boostkore.com/";
 }
 

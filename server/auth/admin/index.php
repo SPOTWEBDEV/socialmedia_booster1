@@ -9,7 +9,7 @@
             while ($row = mysqli_fetch_assoc($select)) {
 
                 $id = $row['id'];
-                $full_name = $row['full_name'];
+                $name = $row['name'];
                 $email = $row['email'];
                 $password = $row['password'];
 

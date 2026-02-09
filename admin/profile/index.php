@@ -2433,7 +2433,7 @@
                                                                                 <input type="text"
                                                                                     class="form-control mb-4"
                                                                                     placeholder="Full Name"
-                                                                                    value="<?php echo $full_name    ?>" name="acct_name"
+                                                                                    value="<?php echo $name    ?>" name="acct_name"
                                                                                     readonly="" autocomplete="off">
                                                                             </div>
                                                                         </div>

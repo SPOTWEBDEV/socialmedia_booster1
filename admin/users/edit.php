@@ -2393,65 +2393,21 @@ include('../../server/auth/admin/index.php');
                           <div class="row">
                             <div class="col-lg-11 mx-auto">
                               <div class="row">
-                                <!-- Profile Upload -->
-                                <div class="col-xl-2 col-lg-12 col-md-4 text-center">
-                                  <div class="upload mt-4 pr-md-4">
-                                    <center>
-                                      <div class="dropify-wrapper has-preview">
-                                        <div class="dropify-loader" style="display: none;"></div>
-                                        <div class="dropify-errors-container">
-                                          <ul></ul>
-                                        </div>
-                                        <input type="" name="profile_picture" id="input-file-max-fs" class="dropify"
-                                          data-default-file="../../upload/profiles/<?php echo $user['profile']; ?>"
-                                          data-max-file-size="2M" autocomplete="off">
-                                        <button type="button" class="dropify-clear">
-                                          <i class="flaticon-close-fill"></i>
-                                        </button>
-                                        <div class="dropify-preview" style="display: block;">
-                                          <span class="dropify-render">
-                                            <img src="../../upload/profiles/<?php echo $user['profile']; ?>" alt="User Image" class="img-fluid">
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </center>
-                                  </div>
-                                </div>
+
 
                                 <!-- Form Fields -->
                                 <div class="col-xl-10 col-lg-12 col-md-8 mt-md-0 mt-4">
                                   <div class="form">
 
+
                                     <div class="row">
                                       <div class="col-sm-6">
                                         <div class="form-group">
-                                          <label for="acct_no">Account Number</label>
-                                          <input type="text" class="form-control mb-4" placeholder="Enter account number"
-                                            value="<?php echo $user['account_number']; ?>" name="acct_no" autocomplete="off">
+                                          <label for="fullname">Full Name</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['full_name']; ?>" name="fullname" autocomplete="off">
                                         </div>
                                       </div>
-
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="acct_type">Account Type</label>
-                                          <select name="acct_type" class="form-control basic select2-hidden-accessible" required>
-                                            <option value="<?php echo $user['account_type']; ?>">
-                                              <?php echo $user['account_type']; ?>
-                                            </option>
-                                            <option value="Savings">Savings Account</option>
-                                            <option value="Current">Current Account</option>
-                                            <option value="Checking">Checking Account</option>
-                                            <option value="Fixed Deposit">Fixed Deposit</option>
-                                            <option value="Non Resident">Non Resident Account</option>
-                                            <option value="Online Banking">Online Banking</option>
-                                            <option value="Domicilary Account">Domicilary Account</option>
-                                            <option value="Joint Account">Joint Account</option>
-                                          </select>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div class="row">
                                       <div class="col-sm-6">
                                         <div class="form-group">
                                           <label for="acct_email">Email</label>
@@ -2460,25 +2416,13 @@ include('../../server/auth/admin/index.php');
                                         </div>
                                       </div>
 
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="acct_dob">Date of Birth</label>
-                                          <input type="date" class="form-control mb-4" value="<?php echo $user['birth']; ?>"
-                                            name="acct_dob" autocomplete="off">
-                                        </div>
-                                      </div>
+
                                     </div>
 
                                     <div class="row">
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="acct_occupation">Occupation</label>
-                                          <input type="text" class="form-control mb-4" placeholder="Enter occupation"
-                                            value="<?php echo $user['occupation']; ?>" name="acct_occupation" autocomplete="off">
-                                        </div>
-                                      </div>
 
-                                      <div class="col-sm-6">
+
+                                      <div class="col-sm-12">
                                         <div class="form-group">
                                           <label for="acct_phone">Phone Number</label>
                                           <input type="text" class="form-control mb-4" placeholder="Enter phone number"
@@ -2488,54 +2432,6 @@ include('../../server/auth/admin/index.php');
                                     </div>
 
                                     <div class="row">
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="acct_cot">COT Code</label>
-                                          <input type="text" class="form-control mb-4" placeholder="Enter COT code"
-                                            value="<?php echo $user['cot_code']; ?>" name="acct_cot" autocomplete="off">
-                                        </div>
-                                      </div>
-
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="acct_imf">IMF Code</label>
-                                          <input type="text" class="form-control mb-4" placeholder="Enter IMF code"
-                                            value="<?php echo $user['imf_code']; ?>" name="acct_imf" autocomplete="off">
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div class="row">
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="acct_limit">Account Limit</label>
-                                          <input type="text" class="form-control mb-4" placeholder="Enter account limit"
-                                            value="<?php echo $user['account_limit']; ?>" name="acct_limit" autocomplete="off">
-                                        </div>
-                                      </div>
-
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="tax_code">Tax Code</label>
-                                          <input type="text" class="form-control mb-4" placeholder="Enter tax code"
-                                            value="<?php echo $user['tax_code']; ?>" name="tax_code" autocomplete="off">
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div class="row">
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="acct_gender">Gender</label>
-                                          <select name="acct_gender" class="form-control basic select2-hidden-accessible">
-                                            <option value="<?php echo $user['gender']; ?>">
-                                              <?php echo $user['gender']; ?>
-                                            </option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
-                                          </select>
-                                        </div>
-                                      </div>
 
                                       <div class="col-sm-6">
                                         <div class="form-group">
@@ -2544,23 +2440,28 @@ include('../../server/auth/admin/index.php');
                                             value="<?php echo $user['balance']; ?>" name="acct_balance" autocomplete="off">
                                         </div>
                                       </div>
+
                                       <div class="col-sm-6">
                                         <div class="form-group">
-                                          <label for="acct_type">Kyc Verification</label>
-                                          <select name="kyc" class="form-control basic select2-hidden-accessible" required>
-                                            <option value="<?php echo $user['kyc']; ?>">
-                                              <?php echo $user['kyc']; ?>
-                                            </option>
-                                            <option value="verified">verified</option>
-                                            <option value="unverified">Unverified</option>
-
-                                          </select>
+                                          <label for="referral_earnings">Referral Earnings</label>
+                                          <input type="text" class="form-control mb-4" 
+                                            value="<?php echo $user['referral_earnings']; ?>" name="referral_earnings" autocomplete="off">
                                         </div>
                                       </div>
+
+                                    </div>
+
+                                    
+
+                                    <div class="row">
+
+
+
+
                                       <div class="col-sm-6">
                                         <div class="form-group">
                                           <label for="acct_dob">Register Date</label>
-                                          <input type="text" class="form-control mb-4" value="<?php echo $user['date_created']; ?>"
+                                          <input type="text" class="form-control mb-4" value="<?php echo $user['created_at']; ?>"
                                             name="date_created" autocomplete="off">
                                         </div>
                                       </div>
@@ -2605,7 +2506,7 @@ include('../../server/auth/admin/index.php');
 
                     <div class="section about">
                       <div class="info">
-                        <h5>ACTIVE / SUSPENDED &amp; BILLING CODE</h5>
+                        <h5>ACTIVE / SUSPENDED</h5>
                         <div class="row">
 
                           <!-- Account Status Section -->
@@ -2618,7 +2519,7 @@ include('../../server/auth/admin/index.php');
                               <label for="acct_status">SELECT TYPE IF HOLD OR ACTIVE</label>
                               <select name="acct_status" class="form-control basic select2-hidden-accessible" aria-hidden="true">
                                 <option value="" data-select2-id="9">Select</option>
-                                <option value="active" data-select2-id="25">ACTIVE</option>
+                                <option value="verified" data-select2-id="25">ACTIVE</option>
                                 <option value="suspended" data-select2-id="26">SUSPENDED</option>
 
                               </select> <br>
@@ -2670,25 +2571,7 @@ include('../../server/auth/admin/index.php');
                             ?>
                           </form>
 
-                          <!-- Billing Code Section -->
-                          <form method="post" class="col-md-4 mx-auto">
-                            <div class="form-group">
-                              <button class="btn btn-danger mb-4 disabled">
-                                BILLING CODE STATUS: <b> <?php echo $user['billing_status']   ?></b>
-                              </button>
-                              <br>
-                              <label for="billing_type">SELECT BILLING CODE</label>
-                              <select name="billing_type" class="form-control basic select2-hidden-accessible" data-select2-id="10" tabindex="-1" aria-hidden="true">
-                                <option value="" data-select2-id="12">Select</option>
-                                <option value="active" data-select2-id="28">ACTIVE</option>
-                                <option value="deactivated" data-select2-id="29">DEACTIVATE</option>
-                              </select>
-
-                            </div>
-                            <div class="text-center">
-                              <button class="btn btn-primary" name="billing_code">Change Billing Code</button>
-                            </div>
-                          </form>
+                         
 
                         </div>
                       </div>
@@ -2701,166 +2584,8 @@ include('../../server/auth/admin/index.php');
 
 
                 </div>
-                <div class="col-xl-6 col-lg-6 col-md-6 layout-spacing">
 
 
-                  <form class="section about" method="post">
-                    <div class="info">
-                      <h5 class="">Change Password</h5>
-                      <div class="row">
-                        <div class="col-md-11 mx-auto">
-                          <div class="form-group">
-                            <label>Old Password</label>
-                            <input type="password" class="form-control mb-4" name="old_password"
-                              placeholder="Old Password" value="" autocomplete="off" required>
-                          </div>
-                          <div class="form-group">
-                            <label>New Password</label>
-                            <input type="password" class="form-control mb-4" name="new_password"
-                              placeholder="New Password" value="" autocomplete="off" required>
-                          </div>
-                          <div class="form-group">
-                            <label>Confirm Password</label>
-                            <input type="password" class="form-control mb-4" name="confirm_password"
-                              placeholder="Confirm Password" autocomplete="off" required>
-                          </div>
-                          <div class="form-group">
-                            <button class="btn btn-primary" name="change_password">Change Password</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-
-                  <?php
-
-
-                  if (isset($_POST['change_password'])) {
-                    $old_password = $_POST['old_password'];
-                    $new_password = $_POST['new_password'];
-                    $confirm_password = $_POST['confirm_password'];
-                    $user_id = $_GET['id'];
-
-                    $statement = $connection->prepare("SELECT password FROM users WHERE id = ?");
-                    $statement->bind_param("i", $user_id);
-                    $statement->execute();
-                    $result = $statement->get_result();
-                    if ($result->num_rows > 0) {
-                      $user = $result->fetch_assoc();
-                      if (password_verify($old_password, $user['password'])) {
-                        if ($new_password === $confirm_password) {
-                          $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-                          $update_statement = $connection->prepare("UPDATE users SET password = ? WHERE id = ?");
-                          $update_statement->bind_param("si", $hashed_password, $user_id);
-                          if ($update_statement->execute()) {
-                            echo "<script>toastr.success('Password changed successfully!');</script>";
-                            echo "<script>setTimeout(function(){ window.location.href = 'edit.php?id=$user_id'; }, 2000);</script>";
-                          } else {
-                            echo "<script>toastr.error('Failed to change password.');</script>";
-                          }
-                        } else {
-                          echo "<script>toastr.error('New password and confirm password do not match.');</script>";
-                        }
-                      } else {
-                        echo "<script>toastr.error('Old password is incorrect.');</script>";
-                      }
-                    } else {
-                      echo "<script>toastr.error('User not found.');</script>";
-                    }
-                  }
-
-
-                  ?>
-
-
-                </div>
-                <div class="col-xl-6 col-lg-6 col-md-6 layout-spacing">
-                  <form class="section about" method="post" autocomplete="off" autofocus="off">
-                    <div class="info">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <h5 class="">Change Pin</h5>
-                        </div>
-
-                      </div>
-                      <div class="row">
-                        <div class="col-md-11 mx-auto">
-                          <div class="form-group">
-                            <!--                                                <p class="text-danger"></p>-->
-                            <label>Current Pin</label>
-                            <input type="password" class="form-control mb-4" name="current_pin"
-                              placeholder="Current Pin" value="" autocomplete="off">
-                          </div>
-                          <div class="form-group">
-                            <label>New Pin</label>
-                            <input type="password" class="form-control mb-4" name="new_pin" placeholder="New Pin"
-                              value="" autocomplete="off">
-                          </div>
-                          <div class="form-group">
-                            <label>Confirm Pin</label>
-                            <input type="password" class="form-control mb-4" name="confirm_pin"
-                              placeholder="Confirm Pin" autocomplete="off">
-                          </div>
-                          <div class="form-group">
-                            <button class="btn btn-primary" name="change_pin"> Change Pin</button>
-                            <button class="btn btn-danger" name="status_delete"> Delete User</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-
-
-                  <?php
-
-                  if (isset($_POST['change_pin'])) {
-                    $current_pin = $_POST['current_pin'];
-                    $new_pin = $_POST['new_pin'];
-                    $confirm_pin = $_POST['confirm_pin'];
-                    $user_id = $_GET['id'];
-
-                    $statement = $connection->prepare("SELECT pin FROM users WHERE id = ?");
-                    $statement->bind_param("i", $user_id);
-                    $statement->execute();
-                    $result = $statement->get_result();
-                    if ($result->num_rows > 0) {
-                      $user = $result->fetch_assoc();
-                      if ($current_pin === $user['pin']) {
-                        if ($new_pin === $confirm_pin) {
-                          $update_statement = $connection->prepare("UPDATE users SET pin = ? WHERE id = ?");
-                          $update_statement->bind_param("si", $new_pin, $user_id);
-                          if ($update_statement->execute()) {
-                            echo "<script>toastr.success('Pin changed successfully!');</script>";
-                            echo "<script>setTimeout(function(){ window.location.href = 'edit.php?id=$user_id'; }, 2000);</script>";
-                          } else {
-                            echo "<script>toastr.error('Failed to change pin.');</script>";
-                          }
-                        } else {
-                          echo "<script>toastr.error('New pin and confirm pin do not match.');</script>";
-                        }
-                      } else {
-                        echo "<script>toastr.error('Current pin is incorrect.');</script>";
-                      }
-                    } else {
-                      echo "<script>toastr.error('User not found.');</script>";
-                    }
-                  }
-
-
-                  if (isset($_POST['status_delete'])) {
-                    $user_id = $_GET['id'];
-                    $delete_statement = $connection->prepare("DELETE FROM users WHERE id = ?");
-                    $delete_statement->bind_param("i", $user_id);
-                    if ($delete_statement->execute()) {
-                      echo "<script>toastr.success('User deleted successfully!');</script>";
-                      echo "<script>setTimeout(function(){ window.location.href = 'index.php'; }, 2000);</script>";
-                    } else {
-                      echo "<script>toastr.error('Failed to delete user.');</script>";
-                    }
-                  }
-
-                  ?>
-                </div>
               </div>
             </div>
           </div>

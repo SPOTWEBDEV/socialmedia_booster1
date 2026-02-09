@@ -16,6 +16,8 @@
     <link rel="stylesheet" type="text/css" href="../auth/asset/css/forms/theme-checkbox-radio.css">
     <link rel="stylesheet" type="text/css" href="../auth/asset/css/forms/switches.css">
     <link href="../auth/asset/css/pages/error/style-400.css" rel="stylesheet" type="text/css" />
+    <meta name="description" content="Boostkore helps you grow your social media presence with fast, secure, and affordable boosting services for Instagram, Facebook, TikTok, YouTube, and more.">
+
 
 
     <!-- BEGIN THEME GLOBAL STYLES -->

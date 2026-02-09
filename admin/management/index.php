@@ -3,7 +3,16 @@
 include('../../server/connection.php');
 include('../../server/auth/admin/index.php');
 
+
+$settings = $connection->query("SELECT * FROM sitedetails LIMIT 1")->fetch_assoc();
+
+$siteprice     = $settings['siteprice'];
+$rateusd       = $settings['rateusd'];
+$refferalbonus = $settings['refferalbonus'];
+
 ?>
+
+
 <html lang="en">
 
 <head>
@@ -41,6 +50,26 @@ include('../../server/auth/admin/index.php');
     <script src="../source/plugins/sweetalerts/promise-polyfill.js"></script>
     <script src="../source/assets/js/libs/jquery-3.1.1.min.js"></script>
 
+
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    <!-- jQuery (required by Toastr) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="">
+        toastr.options = {
+
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right", // other options: toast-bottom-left, toast-bottom-right, toast-top-left, toast-top-full-width, toast-bottom-full-width, toast-top-center, toast-bottom-center
+            "timeOut": "2000" // milliseconds before toast disappears
+        }
+    </script>
+
+    <style type="text/css" id="operaUserStyle"></style>
     <style type="text/css">
         .apexcharts-canvas {
             position: relative;
@@ -2334,6 +2363,7 @@ include('../../server/auth/admin/index.php');
 
     <!--  END LOADER -->
 
+
     <!--  BEGIN NAVBAR  -->
     <?php include("../includes/navbar.php")  ?>
     <!--  END NAVBAR  -->
@@ -2341,7 +2371,7 @@ include('../../server/auth/admin/index.php');
     <!--  BEGIN MAIN CONTAINER  -->
     <div class="main-container" id="container">
 
-        <div class="overlay show"></div>
+        <div class="overlay"></div>
         <div class="search-overlay"></div>
 
         <!--  BEGIN SIDEBAR  -->
@@ -2349,127 +2379,98 @@ include('../../server/auth/admin/index.php');
         <!--  END SIDEBAR  -->
 
 
-
-
         <!--  BEGIN CONTENT AREA  -->
         <div id="content" class="main-content">
             <div class="layout-px-spacing">
+                <div class="account-settings-container layout-top-spacing">
 
-                <div class="page-header">
-                    <div class="page-title">
-                        <h3>Order Placed</h3>
-                    </div>
-                </div>
-
-                <div class="row layout-top-spacing" id="cancel-row">
-
-                    <div class="col-xl-12 col-lg-12 col-sm-12  layout-spacing">
-                        <div class="widget-content widget-content-area br-6">
-                            <div class="table-responsive mb-4 mt-4">
-                                <div id="default-ordering_wrapper"
-                                    class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <table id="default-ordering" class="table table-hover dataTable no-footer"
-                                                style="width:100%" role="grid" aria-describedby="default-ordering_info">
-                                                <thead>
-                                                    <tr role="row">
-                                                        <th class="sorting_asc" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-sort="ascending"
-                                                            aria-label="S/N: activate to sort column descending"
-                                                            style="width: 36.3594px;">S/N</th>
-                                                        <th class="sorting" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="NAME: activate to sort column ascending"
-                                                            style="width: 168.25px;">NAME</th>
-                                                        <th class="sorting" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="EMAIL: activate to sort column ascending"
-                                                            style="width: 111.922px;">EMAIL</th>
-                                                        <th class="sorting" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="ORDER NAME: activate to sort column ascending"
-                                                            style="width: 148.672px;"> ORDER NAME</th>
-                                                        
-                                                        <th class="sorting" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="ORDER CATEGORY: activate to sort column ascending"
-                                                            style="width: 148.672px;"> ORDER CATEGORY</th>
-                                                
-                                                        <th class="sorting" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="ORDER PRICE: activate to sort column ascending"
-                                                            style="width: 173.875px;">ORDER PRICE</th>
-                                                        <th class="sorting" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="QUANITY: activate to sort column ascending"
-                                                            style="width: 127.641px;">QUANITY</th>
-                                                        
-                                                        <th class="sorting" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="DATE: activate to sort column ascending"
-                                                            style="width: 247.672px;">DATE</th>
-                                                        <th class="sorting" tabindex="0"
-                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="STATUS: activate to sort column ascending"
-                                                            style="width: 71.6094px;">STATUS</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
+                    <div class="account-content">
+                        <div class="scrollspy-example" data-spy="scroll" data-target="#account-settings-scroll"
+                            data-offset="-100">
+                            <div class="row">
 
 
-                                                    <?php
 
-                                                    $query = "SELECT user_orders.* , users.email,users.phone,users.full_name
-                                                                FROM user_orders , users 
-                                                                WHERE user_orders.user = users.id
-                                                                ORDER BY id DESC";
-                                                    $result = mysqli_query($connection, $query);
-                                                    $count = 0;
-                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                <div class="col-xl-6 col-lg-6 col-md-6 offset-md-3 layout-spacing">
+                                    <form class="section about" method="post">
+                                        <div class="info">
+                                            <h5 class="">Site Settings</h5>
 
-                                                        $count++;
-                                                        $id = $row['id'];
-                                                        $name = $row['full_name'];
-                                                        $phone = $row['phone'];
-                                                        $amount = $row['order_price'];
-                                                        $order_name = $row['order_name'];
-                                                        $order_category = $row['order_category'];
-                                                        $status = $row['status'];
-                                                        $email = $row['email'];
-                                                        $date = $row['created_at'];
+                                            <div class="row">
+                                                <div class="col-md-11 mx-auto">
 
-                                                        echo "<tr role='row'>
-                                                                        <td class='sorting_1'>$count</td>
-                                                                        <td>$name</td>
-                                                                        <td>$email</td>
-                                                                        <td>$order_name</td>
-                                                                        <td>$order_category</td>
-                                                                        <td>$amount</td>
-                                                                        <td>$reference</td>
-                                                                        <td>$date</td>
-                                                                        <td class='text-center '>$status</td>
-                                                                    </tr>";
-                                                    }
+                                                    <div class="form-group">
+                                                        <label>Site Price (₦)</label>
+                                                        <input type="number" step="0.01" class="form-control mb-4"
+                                                            name="siteprice"
+                                                            value="<?= htmlspecialchars($siteprice) ?>">
+                                                    </div>
 
+                                                    <div class="form-group">
+                                                        <label>USD Rate</label>
+                                                        <input type="number" step="0.01" class="form-control mb-4"
+                                                            name="rateusd"
+                                                            value="<?= htmlspecialchars($rateusd) ?>">
+                                                    </div>
 
-                                                    ?>
-                                                </tbody>
+                                                    <div class="form-group">
+                                                        <label>Referral Bonus</label>
+                                                        <input type="number" step="0.01" class="form-control mb-4"
+                                                            name="refferalbonus"
+                                                            value="<?= htmlspecialchars($refferalbonus) ?>">
+                                                    </div>
 
-                                            </table>
+                                                    <div class="form-group">
+                                                        <button class="btn btn-primary" name="update_settings">
+                                                            Update Settings
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-
+                                    </form>
                                 </div>
+
+                                <?php
+                                if (isset($_POST['update_settings'])) {
+
+                                    $siteprice     = $_POST['siteprice'];
+                                    $rateusd       = $_POST['rateusd'];
+                                    $refferalbonus = $_POST['refferalbonus'];
+
+                                    if ($siteprice === '' || $rateusd === '' || $refferalbonus === '') {
+                                        echo "<script>toastr.error('All fields are required');</script>";
+                                    } else {
+
+                                        $stmt = $connection->prepare(
+                                            "UPDATE sitedetails 
+             SET siteprice = ?, rateusd = ?, refferalbonus = ? 
+             WHERE id = 1"
+                                        );
+
+                                        $stmt->bind_param("ddd", $siteprice, $rateusd, $refferalbonus);
+
+                                        if ($stmt->execute()) {
+                                            echo "<script>
+                                              toastr.success('Site settings updated successfully');
+                                              window.location.href = './index.php'
+                                            </script>";
+                                        } else {
+                                            echo "<script>toastr.error('Failed to update settings');</script>";
+                                        }
+
+                                        $stmt->close();
+                                    }
+                                }
+                                ?>
+
+
+
+
                             </div>
                         </div>
                     </div>
-
-
-
-
-
                 </div>
 
                 <div class="footer-wrapper">
@@ -2556,8 +2557,74 @@ include('../../server/auth/admin/index.php');
             });
         </script>
 
+        <script>
+            $(".edit-crypto").click(function(e) {
+                e.preventDefault();
+                $("#crypto_name").val($(this).data('name'));
+                $("#wallet_address").val($(this).data('wallet-address'));
+                $("#crypto_id").val($(this).data('id'));
+                $(".show-modal").click();
+            });
+        </script>
+
+        <script>
+            function toast(msg, type) {
+                return swal({
+                    type: type,
+                    title: type,
+                    text: msg,
+                    padding: "2em"
+                });
+            }
+
+            $(".delete-crypto-currency").on('click', function(e) {
+                e.preventDefault();
+                let crypto_id = $(this).data('id');
+
+                swal({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    padding: '2em'
+                }).then(function(result) {
+                    if (result.value) {
+
+                        $.ajax({
+                            url: 'https://santaaccessfinance.netadmin/crypto-currrency.php',
+                            type: 'post',
+                            dataType: 'json',
+                            data: {
+                                'delete_crypto_currency': '',
+                                'crypto_currency_id': crypto_id
+                            },
+                            timeout: 45000,
+                            success: function(data) {
+                                console.log(data);
 
 
+                                if (data.error == 1) {
+                                    toast(data.msg, 'success');
+                                } else {
+                                    toast(data.msg, 'error');
+                                }
+
+                                setTimeout(function() {
+                                    window.location.href = 'https://santaaccessfinance.netadmin/crypto-currrency.php';
+                                }, 1000)
+                            },
+                            error: function(er) {
+                                // console.log(er.responseText);
+                                toast('error network', 'error');
+                            }
+                        });
+
+                    }
+                })
+
+            });
+        </script>
 
 
         <!-- END PAGE LEVEL SCRIPTS -->

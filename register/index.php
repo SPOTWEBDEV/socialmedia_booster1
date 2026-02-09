@@ -66,8 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 // Credit referral bonus if there is a referrer
                 if($referrer_id){
-                    // Fetch referral bonus from admin table
-                    $bonusQuery = $connection->query("SELECT refferalbonus FROM admin LIMIT 1");
+                    // Fetch referral bonus from sitedetails table
+                    $bonusQuery = $connection->query("SELECT refferalbonus FROM sitedetails LIMIT 1");
                     $bonus = 0;
                     if($bonusQuery && $bonusQuery->num_rows > 0){
                         $bonus = $bonusQuery->fetch_assoc()['refferalbonus'];
