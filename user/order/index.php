@@ -1,6 +1,12 @@
 <?php
 include('../../server/connection.php');
-include('../../server/auth/client.php')
+include('../../server/auth/client.php');
+
+
+
+$get = mysqli_query($connection, "SELECT  siteprice  FROM sitedetails  ORDER BY id LIMIT 1");
+$data = mysqli_fetch_assoc($get);
+$site_price = floatval($data['siteprice'] ?? 0);
 
 
 
@@ -60,22 +66,22 @@ include('../../server/auth/client.php')
       <?php
       include_once('../../server/api/boosting.php');
       $services = $api->services();
- 
+
 
 
       ?>
 
       <!-- Dashboard Content -->
       <section class="p-6 space-y-6">
-       
+
 
         <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-semibold">Boost Services</h2>
-                        <button onclick="window.location.href='../order'" type="submit"
-                            class="w-fit px-4 border-2 text-black border-blue-600 hover:bg-blue-600 hover:text-white  py-2 rounded-lg">
-                            Order History
-                        </button>
-                    </div>
+          <h2 class="text-xl font-semibold">Boost Services</h2>
+          <button onclick="window.location.href='../order'" type="submit"
+            class="w-fit px-4 border-2 text-black border-blue-600 hover:bg-blue-600 hover:text-white  py-2 rounded-lg">
+            Order History
+          </button>
+        </div>
 
         <!-- Filters -->
         <div class="bg-white p-4 rounded-xl flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
@@ -122,7 +128,7 @@ include('../../server/auth/client.php')
                 <h3 class="font-semibold"><?= htmlspecialchars($service->name) ?></h3>
 
                 <span class="text-xs px-2 py-1 rounded
-        <?= $status === 'available'
+                 <?= $status === 'available'
               ? 'bg-green-100 text-green-600'
               : 'bg-red-100 text-red-600' ?>">
                   <?= ucfirst($status) ?>
@@ -138,7 +144,16 @@ include('../../server/auth/client.php')
               </p>
 
               <p class="mt-3 text-lg font-bold">
-                ₦<?= number_format($service->rate, 2) ?> / 1000
+                <?php
+
+                  $thirdParty = (1000 / 1000) * $service->rate;
+                  $siteFee = (1000 / 1000) * $site_price;
+                  $total = $thirdParty + $siteFee;
+
+
+                  echo  '$' . $total . 'PER 1,000';
+
+                  ?>
               </p>
 
               <button

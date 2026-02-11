@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="description" content="" />
 
     <!-- Site Title -->
-    <title>Saasify - Startup & SaaS Landing Page HTML Template</title>
+    <title><?php echo $sitename ?></title>
     <!-- Favicon -->
     <link rel="apple-touch-icon" href="../assets/images/fav.svg" />
     <link rel="shortcut icon" type="image/x-icon" href="../assets/images/fav.svg" />
@@ -156,12 +156,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <form method="POST" class="tj-contact-box">
                         <div class="form-input">
                             <i class="flaticon-user"></i>
-                            <input class="input-fill" type="text" name="login" placeholder="Username or Email" required />
+                            <input class="input-fill" type="text" name="login" placeholder="Enter Email" required />
                         </div>
 
                         <div class="form-input">
                             <i class="flaticon-objective"></i>
-                            <input class="input-fill" type="text" name="password" placeholder="Password" required />
+                            <input class="input-fill" type="text" name="password" placeholder="Enter Password" required />
                         </div>
 
                         <div class="tj-contact-button">

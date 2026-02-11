@@ -111,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="description" content="" />
 
     <!-- Site Title -->
-    <title>Saasify - Startup & SaaS Landing Page HTML Template</title>
+    <title><?php echo $sitename ?></title>
     <!-- Favicon -->
     <link rel="apple-touch-icon" href="../assets/images/fav.svg" />
     <link rel="shortcut icon" type="image/x-icon" href="../assets/images/fav.svg" />

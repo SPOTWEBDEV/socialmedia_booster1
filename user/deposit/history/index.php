@@ -64,7 +64,7 @@ $result = mysqli_query($connection, $query);
                     <form method="GET" class="flex gap-3">
                         <select id="status" class="border rounded-lg px-3 py-2 text-sm">
                             <option value="all" <?= $statusFilter === 'all' ? 'selected' : '' ?>>All Status</option>
-                            <option value="Completed" <?= $statusFilter === 'Completed' ? 'selected' : '' ?>>Completed</option>
+                            <option value="approved" <?= $statusFilter === 'Approved' ? 'selected' : '' ?>>Approved</option>
                             <option value="Processing" <?= $statusFilter === 'Processing' ? 'selected' : '' ?>>Processing</option>
                             <option value="Pending" <?= $statusFilter === 'Pending' ? 'selected' : '' ?>>Pending</option>
                             <option value="Failed" <?= $statusFilter === 'Failed' ? 'selected' : '' ?>>Failed</option>

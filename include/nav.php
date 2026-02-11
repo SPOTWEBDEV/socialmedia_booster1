@@ -1,3 +1,20 @@
+
+<div class="tj-offcanvas-area">
+        <div class="tj-offcanvas-header d-flex align-items-center justify-content-between">
+            <div class="logo-area text-center">
+                <a href="index.html"><img src="<?php  echo $domain ?>assets/images/logo/logo.png" alt="Logo" /></a>
+            </div>
+            <div class="offcanvas-icon">
+                <a id="canva_close" href="#">
+                    <i class="fa-light fa-xmark"></i>
+                </a>
+            </div>
+        </div>
+        <!-- Canvas Mobile Menu start -->
+        <nav class="right_menu_togle mobile-navbar-menu d-lg-none" id="mobile-navbar-menu"></nav>
+        <!-- Canvas Menu end -->
+    </div>
+
 <header class="tj-header-area" id="tj-header-sticky">
     <div class="container">
         <div class="row">
@@ -12,14 +29,23 @@
                 <div class="tj-main-menu d-lg-block d-none text-center" id="main-menu">
                     <ul class="main-menu">
                         <li>
-                            <a class="active" href="#home"> Home</a>
+                            <a class="active" href="<?php  echo $domain ?>#home"> Home</a>
                         </li>
                         <li>
-                            <a href="#about"> About Us</a>
+                            <a href="<?php  echo $domain ?>#about"> About Us</a>
                         </li>
                         <li>
-                            <a href="#features"> Features</a>
+                            <a href="<?php  echo $domain ?>#features"> Features</a>
                         </li>
+                        <li>
+                            <a href="<?php  echo $domain ?>services/"> Services</a>
+                        </li>
+
+
+                        <div class="d-md-none">
+                            <a style="color: white; border:2px solid" class="tj-black-btn" href="<?php  echo $domain ?>register/"> Start Boosting Free</a>
+                            <a style="color: white; border:2px solid" class="tj-black-btn" href="<?php  echo $domain ?>login/"> Login</a>
+                        </div>
                       
                         
                         

@@ -51,25 +51,9 @@ include('./server/connection.php');
 
     
 
-    <!--========== Mobile Menu Start ==============-->
-    <div class="tj-offcanvas-area">
-        <div class="tj-offcanvas-header d-flex align-items-center justify-content-between">
-            <div class="logo-area text-center">
-                <a href="index.html"><img src="assets/images/logo/mobile-logo.png" alt="Logo" /></a>
-            </div>
-            <div class="offcanvas-icon">
-                <a id="canva_close" href="#">
-                    <i class="fa-light fa-xmark"></i>
-                </a>
-            </div>
-        </div>
-        <!-- Canvas Mobile Menu start -->
-        <nav class="right_menu_togle mobile-navbar-menu d-lg-none" id="mobile-navbar-menu"></nav>
-        <!-- Canvas Menu end -->
-    </div>
-    <!--========== Mobile Menu End ==============-->
+   
+    
 
-    <!--========== Header Section Start ==============-->
     <?php include('./include/nav.php') ?>
 
     <!--========== Header Section End ==============-->
@@ -88,7 +72,8 @@ include('./server/connection.php');
                                 <?php echo $sitename ?> helps you grow your social media presence faster. Increase followers, likes, views, and engagement across all major platforms using safe and reliable promotion tools.
                             </p>
                             <div class="tj-slider-button">
-                                <button class="tj-primary-btn" type="submit" value="submit">Start Boosting Now</button>
+                                <a href="https://www.youtube.com/@SPOTWEBCOM-nr2gs"><button class="tj-primary-btn" type="submit" value="submit">Watch Vidoes</button></a>
+                                <a href="<?php echo $domain ?>services/"><button class="tj-primary-btn" type="submit" value="submit">Our Serivces</button></a>
                             </div>
                         </div>
                     </div>
@@ -339,7 +324,7 @@ include('./server/connection.php');
                                 </ul>
                             </div>
                             <div class="tj-solution-button">
-                                <a class="tj-primary-btn" href="./register/"> Start Boosting Free</a>
+                                <a class="tj-primary-btn" href="<?php  echo $domain ?>register/"> Start Boosting Free</a>
                             </div>
                         </div>
                     </div>
@@ -396,7 +381,7 @@ include('./server/connection.php');
                                 </ul>
                             </div>
                             <div class="tj-collaboration-button">
-                                <a class="tj-primary-btn" href="./register/"> Learn More</a>
+                                <a class="tj-primary-btn" href="<?php  echo $domain ?>register/"> Learn More</a>
                             </div>
                         </div>
                     </div>
@@ -543,7 +528,7 @@ include('./server/connection.php');
                                 <?php echo $sitename ?> gives you full control over your social media growth. Monitor campaign status, track engagement, and manage multiple platforms seamlessly from a single dashboard.
                             </p>
                             <div class="tj-communication-button">
-                                <a class="tj-black-btn" href="./register/"> Start Boosting Free</a>
+                                <a class="tj-black-btn" href="<?php  echo $domain ?>register/"> Start Boosting Free</a>
                             </div>
                         </div>
                     </div>
