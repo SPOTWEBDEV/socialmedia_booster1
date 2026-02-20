@@ -30,7 +30,7 @@ if ($connection->connect_error) {
 // Site config
 $sitename = "Boostkore";
 $siteemail = "support@boostkore.com";
-$sitephone = "+44 776 0957 798";
+$sitephone = "+1 234 567 890";
 
 session_start();
 

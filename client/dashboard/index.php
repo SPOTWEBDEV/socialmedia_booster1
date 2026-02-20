@@ -285,7 +285,7 @@ function money($amount)
 
     </div>
 
-    <?php include('../../include/support.php') ?>
+    
 
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"></script>

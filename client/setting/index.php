@@ -327,6 +327,8 @@ $user = mysqli_fetch_assoc(mysqli_query($connection, "
                                                 </div>
                                             </form>
 
+                                            <p class="mt-3">View Documentation <a href="<?= $domain ?>/docs">here</a></p>
+
                                         </div>
                                     </div>
                                 </div>

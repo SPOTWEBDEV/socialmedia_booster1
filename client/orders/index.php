@@ -33,6 +33,7 @@ $site_price = floatval($data['siteprice'] ?? 0);
     <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="<?php echo $domain ?>client/css/style.css">
     <link rel="stylesheet" href="<?php echo $domain ?>client/vendor/toastr/toastr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 
 <body class="dashboard">
@@ -40,7 +41,7 @@ $site_price = floatval($data['siteprice'] ?? 0);
     <div id="main-wrapper">
         <?php include("../include/header.php") ?>
         <!-- nav -->
-       
+
 
         <!-- side nav -->
         <?php include("../include/sidenav.php") ?>
@@ -62,6 +63,55 @@ $site_price = floatval($data['siteprice'] ?? 0);
                                         class="px-5 py-2.5 bg-primary border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-100 transition">
                                         View Order History
                                     </button>
+
+                                    <button data-bs-toggle="dropdown"
+                                        class="px-5 py-2.5 bg-primary border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-100 transition">
+                                        How To Order?
+                                    </button>
+                                    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-end col-6 px-4 py-3">
+
+                                        <h4>Tutorial Video</h4>
+                                        <div class="lists">
+                                            <?php
+
+                                            $tutorial_stmt = $connection->prepare("
+                                                    SELECT * 
+                                                    FROM tutorial
+                                                    
+                                                ");
+                                            $tutorial_stmt->execute();
+                                            $tutorial = $tutorial_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+                                            if (!empty($tutorial)): $count = 0 ?>
+                                                <?php foreach ($tutorial as $tuto): $count++ ?>
+
+                                                    <div class="d-flex align-items-center">
+
+                                                        <div class="shrink-0">
+                                                            <div class="d-flex gap-2 g-2">
+                                                                <?= $count ?> :
+
+                                                                <div class="d-flex gap-1 align-items-center">
+                                                                    <i class="<?= $tuto['icon'] ?>"></i>
+                                                                    <?= htmlspecialchars($tuto['title']) ?>
+                                                                </div>
+
+                                                                <a href="<?= $tuto['link'] ?>"><span class="text-danger">[Watch Now]</span></a>
+                                                        
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <p class="text-center text-muted">No tutorial found</p>
+                                            <?php endif; ?>
+                                        </div>
+
+
+
+                                    </div>
 
                                 </div>
                             </div>
@@ -214,17 +264,17 @@ $site_price = floatval($data['siteprice'] ?? 0);
             categoryFilter.addEventListener('change', filterServices);
 
         });
-         // 🛒 Order Button → localStorage + redirect
-    document.querySelectorAll('.order-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        const card = this.closest('.service-card');
-        const serviceData = JSON.parse(card.dataset.service);
+        // 🛒 Order Button → localStorage + redirect
+        document.querySelectorAll('.order-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const card = this.closest('.service-card');
+                const serviceData = JSON.parse(card.dataset.service);
 
-        localStorage.setItem('selected_service', JSON.stringify(serviceData));
+                localStorage.setItem('selected_service', JSON.stringify(serviceData));
 
-        window.location.href = './purchase-order';
-      });
-    });
+                window.location.href = './purchase-order';
+            });
+        });
     </script>
 
 </body>
