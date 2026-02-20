@@ -5,8 +5,7 @@ class Api
     public $api_url = 'https://honestsmm.com/api/v2';
 
     /** Your API key */
-    // public $api_key = 'a0813fd35b7c461935e9f716e0467674';
-    public $api_key = '3842153dbeac6c279402578b220d3914';
+    public $api_key = '02f0d3826d001eee70ac3062c234d06d';
 
     /** Add order */
     public function order($data)

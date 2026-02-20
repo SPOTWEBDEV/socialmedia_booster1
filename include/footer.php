@@ -83,9 +83,13 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <p class="desc text-center">
+                    <!-- <p class="desc text-center">
                         Copyright © 2023 <a href="#" target="_blank"><?php echo $sitename ?></a>. All Rights Reserved.
                         | Built & Developed by <a href="https://spotwebtech.com.ng/" target="_blank">SPOTWEB TECH</a>
+                    </p> -->
+                    <p class="desc text-center">
+                        Copyright © 2023 <a href="#" target="_blank"><?php echo $sitename ?></a>. All Rights Reserved.
+                        
                     </p>
 
                 </div>

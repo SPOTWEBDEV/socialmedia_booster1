@@ -13,13 +13,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // Fetch user by email OR username
         $stmt = $connection->prepare(
-            "SELECT id,  email, password 
-             FROM users 
-             WHERE email = ? 
-             LIMIT 1"
+            "SELECT id, username, email, password  , last_login_date , current_streak , highest_streak
+     FROM users 
+     WHERE email = ? OR username = ?
+     LIMIT 1"
         );
 
-        $stmt->bind_param("s", $login);
+        $stmt->bind_param("ss", $login, $login);
+
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -27,17 +28,64 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $user = $result->fetch_assoc();
 
-            // Verify password
             if (password_verify($password, $user['password'])) {
 
-                // Login success → set session
-                $_SESSION['user_id']   = $user['id'];
+
+                session_regenerate_id(true);
+
+                $today = date("Y-m-d");
+
+                $lastLogin = $user['last_login_date'];
+                $currentStreak = (int)$user['current_streak'];
+                $highestStreak = (int)$user['highest_streak'];
+
+                if ($lastLogin) {
+
+                    $yesterday = date("Y-m-d", strtotime("-1 day"));
+
+                    if ($lastLogin == $yesterday) {
+                        // Continue streak
+                        $currentStreak++;
+                    } elseif ($lastLogin == $today) {
+                        // Same day login → no change
+                    } else {
+                        // Missed a day → reset streak
+                        $currentStreak = 1;
+                    }
+                } else {
+                    // First login ever
+                    $currentStreak = 1;
+                }
+
+                // Update highest streak
+                if ($currentStreak > $highestStreak) {
+                    $highestStreak = $currentStreak;
+                }
+
+                // Save to DB
+                $update = $connection->prepare("
+                    UPDATE users 
+                    SET last_login_date=?, current_streak=?, highest_streak=? 
+                    WHERE id=?
+                ");
+
+                $update->bind_param("siii", $today, $currentStreak, $highestStreak, $user['id']);
+                $update->execute();
+                $notify = $connection->prepare("
+                        INSERT INTO notifications (type, user_id, message) 
+                        VALUES ('system', ?, 'Login successful')
+                    ");
+                $notify->bind_param("i", $user['id']);
+                $notify->execute();
+
+                $_SESSION['user_id'] = $user['id'];
 
                 echo "<script>
                   setTimeout(()=>{
-                    window.location.href = '../user/dashboard/'
+                    window.location.href = '../client/dashboard/'
                   },1000)
                 </script>";
+                exit();
             } else {
                 $error = "Invalid login details.";
             }
@@ -95,25 +143,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div id="tj-overlay-bg2" class="tj-overlay-canvas"></div>
 
 
-
-    <!--========== Mobile Menu Start ==============-->
-    <div class="tj-offcanvas-area">
-        <div class="tj-offcanvas-header d-flex align-items-center justify-content-between">
-            <div class="logo-area text-center">
-                <a href="index.html"><img src="../assets/images/logo/mobile-logo.png" alt="Logo" /></a>
-            </div>
-            <div class="offcanvas-icon">
-                <a id="canva_close" href="#">
-                    <i class="fa-light fa-xmark"></i>
-                </a>
-            </div>
-        </div>
-        <!-- Canvas Mobile Menu start -->
-        <nav class="right_menu_togle mobile-navbar-menu d-lg-none" id="mobile-navbar-menu"></nav>
-        <!-- Canvas Menu end -->
-    </div>
-    <!--========== Mobile Menu End ==============-->
-
     <?php include('../include/nav.php') ?>
 
     <!--========== Contact Section Start ==============-->
@@ -156,13 +185,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <form method="POST" class="tj-contact-box">
                         <div class="form-input">
                             <i class="flaticon-user"></i>
-                            <input class="input-fill" type="text" name="login" placeholder="Enter Email" required />
+                            <input class="input-fill" type="text" name="login" placeholder="Enter Email Or Username" required />
                         </div>
 
                         <div class="form-input">
-                            <i class="flaticon-objective"></i>
-                            <input class="input-fill" type="text" name="password" placeholder="Enter Password" required />
+                            <i class="flaticon-user"></i>
+
+
+                            <input class="input-fill" type="password" id="password" name="password" placeholder="Enter Password" required />
+
                         </div>
+                        <div style="margin-top:8px;">
+                            <input type="checkbox" id="showPassword">
+                            <label for="showPassword"> Show Password</label>
+                        </div>
+
 
                         <div class="tj-contact-button">
                             <button class="tj-primary-btn contact-btn" type="submit">
@@ -214,6 +251,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </div>
     <!--========== End scrollUp ==============-->
+
+    <script>
+        document.getElementById("showPassword").addEventListener("change", function() {
+            var password = document.getElementById("password");
+
+            if (this.checked) {
+                password.type = "text";
+            } else {
+                password.type = "password";
+            }
+        });
+    </script>
+
 
     <!-- jquery JS -->
     <script src="../assets/js/jquery.min.js"></script>

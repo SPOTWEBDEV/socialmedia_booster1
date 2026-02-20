@@ -3705,7 +3705,13 @@ START: Contact CSS
     position: relative;
 }
 
-.tj-contact-box .form-input .input-fill[type=text] {
+.tj-contact-box .form-input .input-fill[type=text]{
+    border-radius: 10px;
+    border: 1.5px solid var(--tj-color-light-6);
+    padding: 17px 50px;
+}
+
+ .tj-contact-box .form-input .input-fill[type=password] {
     border-radius: 10px;
     border: 1.5px solid var(--tj-color-light-6);
     padding: 17px 50px;

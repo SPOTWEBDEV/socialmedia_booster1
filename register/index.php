@@ -1,13 +1,13 @@
-<?php 
+<?php
 include('../server/connection.php');
 
 $success = "";
 $error = "";
 
-$referral_code = trim($_GET['referral_code'] ?? ''); 
+$referral_code = trim($_GET['referral_code'] ?? '');
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
+    $username  = trim($_POST['username']);
     $name     = trim($_POST['name']);
     $phone    = trim($_POST['phone']);
     $email    = trim($_POST['email']);
@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     // Basic validation
-    if (empty($name) || empty($phone) || empty($email) || empty($password)) {
+    if (empty($name) || empty($phone) || empty($email) || empty($password) || empty($username)) {
         $error = "All fields are required.";
     } else {
 
@@ -34,42 +34,63 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             // Find referrer ID if referral code is provided
             $referrer_id = null;
-            if(!empty($referral_code)){
+            if (!empty($referral_code)) {
                 $stmt_ref = $connection->prepare("SELECT id FROM users WHERE referral_code = ?");
                 $stmt_ref->bind_param("s", $referral_code);
                 $stmt_ref->execute();
                 $result_ref = $stmt_ref->get_result();
-                if($result_ref->num_rows > 0){
+                if ($result_ref->num_rows > 0) {
                     $referrer_id = $result_ref->fetch_assoc()['id'];
                 }
                 $stmt_ref->close();
             }
 
             // Generate a unique referral code for the new user
-            function generateReferralCode($length = 6){
+            function generateReferralCode($length = 6)
+            {
                 $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                 $code = '';
-                for($i=0;$i<$length;$i++){
-                    $code .= $chars[random_int(0, strlen($chars)-1)];
+                for ($i = 0; $i < $length; $i++) {
+                    $code .= $chars[random_int(0, strlen($chars) - 1)];
                 }
                 return $code;
             }
             $new_referral_code = generateReferralCode();
 
             // Insert new user
+            $country  = 'NG';
+            $currency = 'NGN';
+
             $stmt = $connection->prepare(
-                "INSERT INTO users (full_name, phone, email, password, referrer_id, referral_code , country , currency) VALUES (?, ?, ?, ?, ?, ? , ? , ?)"
+                "INSERT INTO users 
+    (username , full_name, phone, email, password, referrer_id, referral_code, country, currency) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?)"
             );
-            $stmt->bind_param("ssssssss", $name, $phone, $email, $hashedPassword, $referrer_id, $new_referral_code , 'NG' , 'NGN');
+
+            $stmt->bind_param(
+                "sssssisss",
+                $username,
+                $name,
+                $phone,
+                $email,
+                $hashedPassword,
+                $referrer_id,
+                $new_referral_code,
+                $country,
+                $currency
+            );
+
+
+
 
             if ($stmt->execute()) {
 
                 // Credit referral bonus if there is a referrer
-                if($referrer_id){
+                if ($referrer_id) {
                     // Fetch referral bonus from sitedetails table
                     $bonusQuery = $connection->query("SELECT refferalbonus FROM sitedetails LIMIT 1");
                     $bonus = 0;
-                    if($bonusQuery && $bonusQuery->num_rows > 0){
+                    if ($bonusQuery && $bonusQuery->num_rows > 0) {
                         $bonus = $bonusQuery->fetch_assoc()['refferalbonus'];
                     }
 
@@ -78,7 +99,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $update->bind_param("di", $bonus, $referrer_id);
                     $update->execute();
                     $update->close();
+
+                    // Notify referrer
+                    $refNotify = $connection->prepare("
+                        INSERT INTO notifications (type, user_id, message) 
+                        VALUES ('system', ?, ?)
+                    ");
+
+                    $refMessage = "You earned ₦$bonus referral bonus from a new signup.";
+                    $refNotify->bind_param("is", $referrer_id, $refMessage);
+                    $refNotify->execute();
+                    $refNotify->close();
                 }
+
+                $newUserId = $stmt->insert_id;
+                // Insert account created notification
+                $notify = $connection->prepare("
+                    INSERT INTO notifications (type, user_id, message) 
+                    VALUES ('system', ?, ?)
+                ");
+
+                $message = "Welcome to $sitename! Your account was created successfully.";
+                $notify->bind_param("is", $newUserId, $message);
+                $notify->execute();
+                $notify->close();
 
                 $success = "Account created successfully!";
                 echo "<script>
@@ -86,7 +130,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     window.location.href = '../login'
                   },2000)
                 </script>";
-
             } else {
                 $error = "Something went wrong. Please try again.";
             }
@@ -143,25 +186,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
     <div id="tj-overlay-bg2" class="tj-overlay-canvas"></div>
 
-   
 
-    <!--========== Mobile Menu Start ==============-->
-    <div class="tj-offcanvas-area">
-        <div class="tj-offcanvas-header d-flex align-items-center justify-content-between">
-            <div class="logo-area text-center">
-                <a href="index.html"><img src="../assets/images/logo/mobile-logo.png" alt="Logo" /></a>
-            </div>
-            <div class="offcanvas-icon">
-                <a id="canva_close" href="#">
-                    <i class="fa-light fa-xmark"></i>
-                </a>
-            </div>
-        </div>
-        <!-- Canvas Mobile Menu start -->
-        <nav class="right_menu_togle mobile-navbar-menu d-lg-none" id="mobile-navbar-menu"></nav>
-        <!-- Canvas Menu end -->
-    </div>
-    <!--========== Mobile Menu End ==============-->
+
 
     <?php include('../include/nav.php') ?>
 
@@ -195,30 +221,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <div style="background:red; margin-bottom:10px;color:white; padding:10px 20px">
                             <?= $error ?>
                         </div>
-         <?php endif; ?>
+                    <?php endif; ?>
 
                     <?php if (!empty($success)): ?>
                         <div style="background:green; margin-bottom:10px;color:white; padding:10px 20px">
                             <?= $success ?>
                         </div>
-         <?php endif; ?>
+                    <?php endif; ?>
 
                     <form method="POST" class="tj-contact-box">
                         <div class="form-input">
                             <i class="flaticon-user"></i>
-                            <input class="input-fill" type="text" id="name" name="name" placeholder="Full Name" required="" />
+                            <input class="input-fill" type="text" id="username" name="username" placeholder="Enter Username" required="" />
+                        </div>
+                        <div class="form-input">
+                            <i class="flaticon-user"></i>
+                            <input class="input-fill" type="text" id="name" name="name" placeholder="Enter Full Name" required="" />
                         </div>
                         <div class="form-input">
                             <i class="flaticon-telephone"></i>
-                            <input class="input-fill" type="tel" id="phone" name="phone" placeholder="Phone Number" required="" />
+                            <input class="input-fill" type="tel" id="phone" name="phone" placeholder="Enter Phone Number" required="" />
                         </div>
                         <div class="form-input">
                             <i class="flaticon-mail"></i>
-                            <input class="input-fill" type="email" id="email" name="email" placeholder="Email Address" required="" />
+                            <input class="input-fill" type="email" id="email" name="email" placeholder="Enter Email Address" required="" />
                         </div>
                         <div class="form-input">
-                            <i class="flaticon-objective"></i>
-                            <input class="input-fill" type="text" id="password" name="password" placeholder="Password" required="" />
+                            <i class="flaticon-key"></i>
+
+
+                            <input class="input-fill" type="password" id="password" name="password" placeholder="Enter Password" required />
+
+                        </div>
+                        <div style="margin-top:8px;">
+                            <input type="checkbox" id="showPassword">
+                            <label for="showPassword"> Show Password</label>
                         </div>
 
                         <div class="tj-contact-button">
@@ -272,6 +309,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </div>
     <!--========== End scrollUp ==============-->
+
+
+    <script>
+        document.getElementById("showPassword").addEventListener("change", function() {
+            var password = document.getElementById("password");
+
+            if (this.checked) {
+                password.type = "text";
+            } else {
+                password.type = "password";
+            }
+        });
+    </script>
 
     <!-- jquery JS -->
     <script src="../assets/js/jquery.min.js"></script>

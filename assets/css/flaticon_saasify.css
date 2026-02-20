@@ -63,6 +63,11 @@ i[class*=" flaticon-"]:before {
     content: "\f10c";
 }
 
+.flaticon-key:before {
+    content: "\f123";
+}
+
+
 .flaticon-telephone:before {
     content: "\f10d";
 }

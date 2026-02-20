@@ -18,6 +18,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != "") {
     $select = mysqli_query($connection, "SELECT * FROM `users` WHERE `id`=$id");
     if (mysqli_num_rows($select)) {
         while ($row = mysqli_fetch_assoc($select)) {
+            $username = sanitize($row['username']);
             $email            = sanitize($row['email']);
             $fullname         = sanitize($row['full_name']);
             $status           = sanitize($row['status']);
@@ -25,6 +26,9 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != "") {
             $balance = $row['balance'];
             $country = $row['country'];
             $currency = $row['currency'];
+            $timezone = $row['timezone'];
+            $current_streak = $row['current_streak'];
+            $highest_streak = $row['highest_streak'];
         }
     } else {
         echo "<script>window.open('$url', '_self');</script>";

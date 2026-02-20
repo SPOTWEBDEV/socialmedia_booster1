@@ -2400,21 +2400,21 @@ $refferalbonus = $settings['refferalbonus'];
                                                 <div class="col-md-11 mx-auto">
 
                                                     <div class="form-group">
-                                                        <label>Site Price (₦)</label>
+                                                        <label>Site Price ($)</label>
                                                         <input type="number" step="0.01" class="form-control mb-4"
                                                             name="siteprice"
                                                             value="<?= htmlspecialchars($siteprice) ?>">
                                                     </div>
 
                                                     <div class="form-group">
-                                                        <label>USD Rate</label>
+                                                        <label>USD Rate (1 USD => <?= htmlspecialchars($rateusd) ?>₦)</label>
                                                         <input type="number" step="0.01" class="form-control mb-4"
                                                             name="rateusd"
                                                             value="<?= htmlspecialchars($rateusd) ?>">
                                                     </div>
 
                                                     <div class="form-group">
-                                                        <label>Referral Bonus</label>
+                                                        <label>Referral Bonus (₦)</label>
                                                         <input type="number" step="0.01" class="form-control mb-4"
                                                             name="refferalbonus"
                                                             value="<?= htmlspecialchars($refferalbonus) ?>">
@@ -2445,8 +2445,8 @@ $refferalbonus = $settings['refferalbonus'];
 
                                         $stmt = $connection->prepare(
                                             "UPDATE sitedetails 
-             SET siteprice = ?, rateusd = ?, refferalbonus = ? 
-             WHERE id = 1"
+                                            SET siteprice = ?, rateusd = ?, refferalbonus = ? 
+                                            WHERE id = 1"
                                         );
 
                                         $stmt->bind_param("ddd", $siteprice, $rateusd, $refferalbonus);
@@ -2577,53 +2577,7 @@ $refferalbonus = $settings['refferalbonus'];
                 });
             }
 
-            $(".delete-crypto-currency").on('click', function(e) {
-                e.preventDefault();
-                let crypto_id = $(this).data('id');
-
-                swal({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Delete',
-                    padding: '2em'
-                }).then(function(result) {
-                    if (result.value) {
-
-                        $.ajax({
-                            url: 'https://santaaccessfinance.netadmin/crypto-currrency.php',
-                            type: 'post',
-                            dataType: 'json',
-                            data: {
-                                'delete_crypto_currency': '',
-                                'crypto_currency_id': crypto_id
-                            },
-                            timeout: 45000,
-                            success: function(data) {
-                                console.log(data);
-
-
-                                if (data.error == 1) {
-                                    toast(data.msg, 'success');
-                                } else {
-                                    toast(data.msg, 'error');
-                                }
-
-                                setTimeout(function() {
-                                    window.location.href = 'https://santaaccessfinance.netadmin/crypto-currrency.php';
-                                }, 1000)
-                            },
-                            error: function(er) {
-                                // console.log(er.responseText);
-                                toast('error network', 'error');
-                            }
-                        });
-
-                    }
-                })
-
-            });
+           
         </script>
 
 

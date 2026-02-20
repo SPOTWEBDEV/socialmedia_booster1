@@ -1,7 +1,7 @@
 <?php
 
-    include('../../server/connection.php');
-    include('../../server/auth/admin/index.php');
+include('../../server/connection.php');
+include('../../server/auth/admin/index.php');
 
 ?>
 
@@ -99,7 +99,7 @@
 
                             <?php
 
-                                    $total_user = mysqli_num_rows(mysqli_query($connection,"SELECT * FROM `users`"));
+                            $total_user = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM `users`"));
 
                             ?>
 
@@ -114,17 +114,17 @@
                                     </div>
                                 </div>
 
-                                
-                            <?php
 
-                                    $total_pending_deposit = mysqli_num_rows(mysqli_query($connection,"SELECT * FROM `deposit` WHERE `status`='pending'"));
+                                <?php
 
-                            ?>
+                                $total_approved_deposit = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM `deposit` WHERE `status`='approved'"));
+
+                                ?>
 
                                 <div class="w-chart-section">
                                     <div class="w-detail">
-                                        <p class="w-title">Total Pending deposit</p>
-                                        <p class="w-stats"><?php echo $total_pending_deposit ?></p>
+                                        <p class="w-title">Total Approved deposit</p>
+                                        <p class="w-stats"><?php echo $total_approved_deposit ?></p>
                                     </div>
                                     <div class="w-chart-render-one">
                                         <div id="paid-visits"></div>
@@ -139,8 +139,15 @@
                             <div class="widget-content">
                                 <div class="w-content">
                                     <div class="w-info">
-                                        <h6 class="value">0</h6>
-                                        <p class="">Pending Credit Card </p>
+                                        <h6 class="value"><?php 
+
+                                         $deposit = mysqli_fetch_assoc(mysqli_query($connection, "SELECT  sum(amount) as amount FROM `deposit` WHERE `status`='approved'"));
+
+                                         echo $deposit['amount'];
+                                        
+                                        ?></h6>
+                                        <p class="">Total Deposit Card </p>
+                                        
                                     </div>
                                     <div class="">
                                         <div class="w-icon">
@@ -163,7 +170,81 @@
                         </div>
                     </div>
 
-                  
+
+                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 layout-spacing">
+                        <div class="widget widget-card-four">
+                            <div class="widget-content">
+                                <div class="w-content">
+                                    <div class="w-info">
+                                        <h6 class="value"><?php 
+
+                                         $deposit = mysqli_fetch_assoc(mysqli_query($connection, "SELECT  sum(profit) as profit FROM `user_orders`"));
+
+                                         echo '$' . $deposit['profit'];
+                                        
+                                        ?></h6>
+                                        <p class="">Total Money Made </p>
+                                        
+                                    </div>
+                                    <div class="">
+                                        <div class="w-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="feather feather-home">
+                                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-gradient-secondary" role="progressbar"
+                                        style="width: 57%" aria-valuenow="57" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 layout-spacing">
+                        <div class="widget widget-card-four">
+                            <div class="widget-content">
+                                <div class="w-content">
+                                    <div class="w-info">
+                                        <h6 class="value"><?php 
+
+                                         $deposit = mysqli_fetch_assoc(mysqli_query($connection, "SELECT  sum(third_party_charge) as third_party_charge  FROM `user_orders`"));
+
+                                         echo '$' . $deposit['third_party_charge'];
+                                        
+                                        ?></h6>
+                                        <p class="">Total Money Expense </p>
+                                        
+                                    </div>
+                                    <div class="">
+                                        <div class="w-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="feather feather-home">
+                                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-gradient-secondary" role="progressbar"
+                                        style="width: 57%" aria-valuenow="57" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
 
                 </div>
 
@@ -195,7 +276,7 @@
         <script src="../source/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
         <script src="../source/assets/js/app.js"></script>
         <script>
-            $(document).ready(function () {
+            $(document).ready(function() {
                 App.init();
             });
         </script>
@@ -224,7 +305,6 @@
             var ss = $(".basic").select2({
                 tags: true,
             });
-
         </script>
 
         <script>
@@ -233,7 +313,10 @@
         <script>
             $('#default-ordering').DataTable({
                 "oLanguage": {
-                    "oPaginate": { "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>', "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' },
+                    "oPaginate": {
+                        "sPrevious": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>',
+                        "sNext": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>'
+                    },
                     "sInfo": "Showing page _PAGE_ of _PAGES_",
                     "sSearch": '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
                     "sSearchPlaceholder": "Search...",
@@ -243,24 +326,23 @@
                 "stripeClasses": [],
                 "lengthMenu": [7, 10, 20, 50],
                 "pageLength": 7,
-                drawCallback: function () { $('.dataTables_paginate > .pagination').addClass(' pagination-style-13 pagination-bordered mb-5'); }
+                drawCallback: function() {
+                    $('.dataTables_paginate > .pagination').addClass(' pagination-style-13 pagination-bordered mb-5');
+                }
             });
         </script>
 
         <script>
-
-            $(".edit-crypto").click(function (e) {
+            $(".edit-crypto").click(function(e) {
                 e.preventDefault();
                 $("#crypto_name").val($(this).data('name'));
                 $("#wallet_address").val($(this).data('wallet-address'));
                 $("#crypto_id").val($(this).data('id'));
                 $(".show-modal").click();
             });
-
         </script>
 
         <script>
-
             function toast(msg, type) {
                 return swal({
                     type: type,
@@ -270,7 +352,7 @@
                 });
             }
 
-            $(".delete-crypto-currency").on('click', function (e) {
+            $(".delete-crypto-currency").on('click', function(e) {
                 e.preventDefault();
                 let crypto_id = $(this).data('id');
 
@@ -281,7 +363,7 @@
                     showCancelButton: true,
                     confirmButtonText: 'Delete',
                     padding: '2em'
-                }).then(function (result) {
+                }).then(function(result) {
                     if (result.value) {
 
                         $.ajax({
@@ -293,7 +375,7 @@
                                 'crypto_currency_id': crypto_id
                             },
                             timeout: 45000,
-                            success: function (data) {
+                            success: function(data) {
                                 console.log(data);
 
 
@@ -303,11 +385,11 @@
                                     toast(data.msg, 'error');
                                 }
 
-                                setTimeout(function () {
+                                setTimeout(function() {
                                     window.location.href = 'https://santaaccessfinance.netadmin/crypto-currrency.php';
                                 }, 1000)
                             },
-                            error: function (er) {
+                            error: function(er) {
                                 // console.log(er.responseText);
                                 toast('error network', 'error');
                             }
@@ -317,7 +399,6 @@
                 })
 
             });
-
         </script>
 
 

@@ -2438,6 +2438,7 @@ include('../../server/auth/admin/index.php');
                                                         $order_category = $row['order_category'];
                                                         $status = $row['status'];
                                                         $email = $row['email'];
+                                                        $quanity = $row['quanity'];
                                                         $date = $row['created_at'];
 
                                                         echo "<tr role='row'>
@@ -2447,9 +2448,10 @@ include('../../server/auth/admin/index.php');
                                                                         <td>$order_name</td>
                                                                         <td>$order_category</td>
                                                                         <td>$amount</td>
-                                                                        <td>$reference</td>
+                                                                        <td>$quanity</td>
+                                                                        
                                                                         <td>$date</td>
-                                                                        <td class='text-center '>$status</td>
+                                                                        <td class='text-center '><button class='btn btn-primary'>View</button></td>
                                                                     </tr>";
                                                     }
 
