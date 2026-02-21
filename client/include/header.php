@@ -3,7 +3,7 @@
     $notif_stmt = $connection->prepare("
     SELECT * 
     FROM notifications
-    WHERE type='overall' OR (type='system' AND user_id = ?)
+    WHERE type='system' AND user_id = ?
     ORDER BY created_at DESC
     LIMIT 5
 ");
@@ -123,6 +123,7 @@
       </div>
   </div>
 
-
-  <?php include('../../include/support.php') ?>
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <?php
+    include('../../include/support.php')
+    ?>

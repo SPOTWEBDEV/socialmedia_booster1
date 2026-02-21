@@ -8,7 +8,7 @@
         <span class="support-label">WhatsApp</span>
     </a>
 
-    <a href="mailto:support@yoursite.com" class="support-btn email">
+    <a href="mailto:support@boostkore.com" class="support-btn email">
         <i class="fas fa-envelope"></i>
         <span class="support-label">Email Support</span>
     </a>
