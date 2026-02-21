@@ -1,6 +1,15 @@
 <?php
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
+// Don't show errors in browser
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+
+// Enable error logging
+ini_set('log_errors', 1);
 
 define("HOST", "localhost");
 
