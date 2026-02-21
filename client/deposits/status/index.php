@@ -44,7 +44,6 @@ curl_close($ch);
 
 $responseText = trim($response);
 
-echo $responseText;
 
 
 // -------------------------
