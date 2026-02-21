@@ -103,6 +103,7 @@ $user_id = $_SESSION['user_id'];
                                 <th>AMOUNT</th>
                                 <th>DATE</th>
                                 <th>STATUS</th>
+                                <th>ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -123,6 +124,12 @@ $user_id = $_SESSION['user_id'];
                             ?>">
                                                 <?= ucfirst($row['status']) ?>
                                             </span>
+                                        </td>
+                                        <td>
+                                            <?php if ($row['status'] === 'pending' || $row['status'] === 'declined'): ?>
+                                                <a href="<?php echo $domain ?>client/deposits/status/?access-code=<?= $row['access_code'] ?>" class="btn btn-sm btn-primary">Verify</a>
+                                            <?php endif; ?>
+                                               
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
