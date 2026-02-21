@@ -191,3 +191,61 @@ $whatsappLink = "https://wa.me/?text={$inviteMessage}";
         </div>
 
     </div>
+
+    <script src="<?php echo $domain ?>client/vendor/jquery/jquery.min.js"></script>
+    <script src="<?php echo $domain ?>client/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo $domain ?>client/js/scripts.js"></script>
+    
+    <script>
+        function copyReferral() {
+            const referralCode = document.getElementById("referralCode").textContent;
+            navigator.clipboard.writeText(referralCode).then(() => {
+                alert("Referral code copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy referral code. Please try manually.");
+            });
+        }
+    </script>
+    <script>
+        const ctx = document.getElementById('referralChart').getContext('2d');
+        const referralChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [<?php
+                    $earningsData = [];
+                    $dateLabels = [];
+                    $result = mysqli_query($connection, "
+                        SELECT DATE(created_at) AS date, SUM(referral_earnings) AS earnings
+                        FROM users
+                        WHERE referrer_id = '$userId'
+                        GROUP BY DATE(created_at)
+                        ORDER BY DATE(created_at) ASC
+                    ");
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $dateLabels[] = "'" . date("d M", strtotime($row['date'])) . "'";
+                        $earningsData[] = $row['earnings'];
+                    }
+                    echo implode(",", $dateLabels);
+                ?>],
+                datasets: [{
+                    label: 'Earnings (₦)',
+                    data: [<?php echo implode(",", $earningsData); ?>],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>

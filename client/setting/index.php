@@ -372,8 +372,8 @@ $user = mysqli_fetch_assoc(mysqli_query($connection, "
 
 
     </div>
-    <script src="<?php echo $domain ?>/vendor/jquery/jquery.min.js"></script>
-    <script src="<?php echo $domain ?>/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo $domain ?>client/vendor/jquery/jquery.min.js"></script>
+    <script src="<?php echo $domain ?>client/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!--  -->
     <!--  -->
     <script src="<?php echo $domain ?>client/js/scripts.js"></script>
