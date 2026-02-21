@@ -78,9 +78,9 @@
                                   </div>
 
 
-                                  <div class="more">
+                                  <!-- <div class="more">
                                       <a href="notifications.html">More<i class="fi fi-bs-angle-right"></i></a>
-                                  </div>
+                                  </div> -->
                               </div>
                           </div>
 

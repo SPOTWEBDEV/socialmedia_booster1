@@ -319,7 +319,7 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
                 <script src="<?php echo $domain ?>/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
                 <!--  -->
                 <!--  -->
-                <script src="<?php echo $domain ?>/js/scripts.js"></script>
+                <script src="<?php echo $domain ?>client/js/scripts.js"></script>
 </body>
 
 </html>

@@ -161,7 +161,7 @@ $result = $stmt->get_result();
     <script src="<?php echo $domain ?>/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!--  -->
     <!--  -->
-    <script src="<?php echo $domain ?>/js/scripts.js"></script>
+    <script src="<?php echo $domain ?>client/js/scripts.js"></script>
 </body>
 
 </html>
