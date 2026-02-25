@@ -29,7 +29,7 @@ $site_price = floatval($data['siteprice'] ?? 0);
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?= $sitename ?> | Order </title>
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo $domain ?>/images/favicon.png">
+    <link rel="icon" type="image/png" href="<?php echo $domain ?>assets/images/logo/favicon.png">
     <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="<?php echo $domain ?>client/css/style.css">
     <link rel="stylesheet" href="<?php echo $domain ?>client/vendor/toastr/toastr.min.css">

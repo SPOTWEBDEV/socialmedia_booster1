@@ -88,7 +88,7 @@ function money($amount)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?php echo $sitename ?> | dashboard</title>
-    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo $domain ?>/images/favicon.png">
+    <link rel="icon" type="image/png" href="<?php echo $domain ?>assets/images/logo/favicon.png">
     <link rel="stylesheet" href="<?php echo $domain ?>client/css/style.css">
     <link rel="stylesheet" href="<?php echo $domain ?>client/vendor/toastr/toastr.min.css">
 </head>
@@ -199,27 +199,27 @@ function money($amount)
                                     <div class="table-responsive">
                                         <?php
                                         $sql = "
-    SELECT id,
-           'Deposit' AS type,
-           amount AS amount,
-           created_at AS date,
-           status
-    FROM deposit
-    WHERE user_id = ?
+                                            SELECT id,
+                                                'Deposit' AS type,
+                                                amount AS amount,
+                                                created_at AS date,
+                                                status
+                                            FROM deposit
+                                            WHERE user_id = ?
 
-    UNION ALL
+                                            UNION ALL
 
-    SELECT id,
-           'Order' AS type,
-           -naria_price AS amount,
-           created_at AS date,
-           status
-    FROM user_orders
-    WHERE user = ?
+                                            SELECT id,
+                                                'Order' AS type,
+                                                -naria_price AS amount,
+                                                created_at AS date,
+                                                status
+                                            FROM user_orders
+                                            WHERE user = ?
 
-    ORDER BY date DESC
-    LIMIT 10
-";
+                                            ORDER BY date DESC
+                                            LIMIT 10
+                                        ";
 
                                         $stmt = mysqli_prepare($connection, $sql);
                                         mysqli_stmt_bind_param($stmt, "ii", $id, $id);
@@ -282,6 +282,10 @@ function money($amount)
 
             </div>
         </div>
+
+        <?php include("../include/footer.php") ?>
+
+
 
     </div>
 

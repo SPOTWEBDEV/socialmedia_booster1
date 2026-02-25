@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
     <title><?php echo  $sitename ?> - Login </title>
-    <link rel="icon" type="image/x-icon" href="../auth/asset/img/favicon.ico"/>
+    <link rel="icon" type="image/x-icon" href="../assets/images/logo/favicon.png"/>
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
     <link href="https://fonts.googleapis.com/css?family=Quicksand:400,500,600,700&amp;display=swap" rel="stylesheet">
     <link href="../auth/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -224,6 +224,4 @@
 
 
 </body>
-
-<!-- Mirrored from santaaccessfinance.net/login.php by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 05 Jul 2025 22:32:17 GMT -->
 </html>

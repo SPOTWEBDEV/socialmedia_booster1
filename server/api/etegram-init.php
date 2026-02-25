@@ -40,7 +40,7 @@ $user = $userResult->fetch_assoc();
 
 
 // Generate unique reference
-$reference = uniqid("ETG_");
+$reference = uniqid("DEP_");
 
 /* -------------------------
    INIT PAYMENT

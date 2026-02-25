@@ -20,15 +20,15 @@
               <div class="col-xxl-12">
                   <div class="header-content">
                       <div class="header-left">
-                          <div class="brand-logo"><a class="mini-logo" href="#"><img src="<?php echo $domain ?>/images/logoi.png" alt="" width="40"></a></div>
+                          <div class="brand-logo"><a class="mini-logo" href="#"><img src="<?php echo $domain ?>assets/images/logo/favicon.png" alt="" width="60"></a></div>
                           <div class="search">
 
-                              <form action="wallets.html#">
+                              <!-- <form action="wallets.html#">
                                   <div class="input-group">
                                       <input type="text" class="form-control" placeholder="Search Here">
                                       <span class="input-group-text"><i class="fi fi-br-search"></i></span>
                                   </div>
-                              </form>
+                              </form> -->
 
                           </div>
                       </div>

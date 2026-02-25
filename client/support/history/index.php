@@ -11,7 +11,7 @@ $user_id = $_SESSION['user_id'];
 <head>
     <meta charset="UTF-8">
     <title><?= $sitename ?> | Support History</title>
-    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo $domain ?>/images/favicon.png">
+    <link rel="icon" type="image/png" href="<?php echo $domain ?>assets/images/logo/favicon.png">
     <link rel="stylesheet" href="<?php echo $domain ?>client/css/style.css">
     <link rel="stylesheet" href="<?php echo $domain ?>client/vendor/toastr/toastr.min.css">
 </head>
