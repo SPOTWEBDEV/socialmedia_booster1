@@ -40,6 +40,23 @@ include('../../server/auth/admin/index.php');
     <link href="../source/assets/css/components/custom-sweetalert.css" rel="stylesheet" type="text/css">
     <script src="../source/plugins/sweetalerts/promise-polyfill.js"></script>
     <script src="../source/assets/js/libs/jquery-3.1.1.min.js"></script>
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    <!-- jQuery (required by Toastr) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="">
+        toastr.options = {
+
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right", // other options: toast-bottom-left, toast-bottom-right, toast-top-left, toast-top-full-width, toast-bottom-full-width, toast-top-center, toast-bottom-center
+            "timeOut": "2000" // milliseconds before toast disappears
+        }
+    </script>
 
     <style type="text/css">
         .apexcharts-canvas {
@@ -2357,7 +2374,7 @@ include('../../server/auth/admin/index.php');
 
                 <div class="page-header">
                     <div class="page-title">
-                        <h3>Top 20 Referral Earners</h3>
+                        <h3>Pending Deposits</h3>
                     </div>
                 </div>
 
@@ -2370,6 +2387,89 @@ include('../../server/auth/admin/index.php');
                                     class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
                                     <div class="row">
                                         <div class="col-sm-12">
+                                            <?php
+
+                                            if (isset($_POST['approve_deposit']) || isset($_POST['decline_deposit'])) {
+
+                                                $deposit_id = intval($_POST['deposit_id']);
+
+                                                if (!$deposit_id) {
+                                                    echo "<script>toastr.error('Invalid deposit');</script>";
+                                                } else {
+
+                                                    $stmt = $connection->prepare("SELECT * FROM deposit WHERE id = ?");
+                                                    $stmt->bind_param("i", $deposit_id);
+                                                    $stmt->execute();
+                                                    $result = $stmt->get_result();
+                                                    $deposit = $result->fetch_assoc();
+
+                                                    if (!$deposit) {
+
+                                                        echo "<script>toastr.error('Deposit not found');</script>";
+                                                    } elseif ($deposit['status'] != 'pending') {
+
+                                                        echo "<script>toastr.error('Deposit already processed');</script>";
+                                                    } else {
+
+                                                        // ================= APPROVE =================
+                                                        if (isset($_POST['approve_deposit'])) {
+
+                                                            $connection->begin_transaction();
+
+                                                            try {
+
+                                                                // Credit user
+                                                                $stmt = $connection->prepare("
+                        UPDATE users 
+                        SET balance = balance + ? 
+                        WHERE id = ?
+                    ");
+
+                                                                $stmt->bind_param(
+                                                                    "di",
+                                                                    $deposit['amount'],
+                                                                    $deposit['user_id']
+                                                                );
+                                                                $stmt->execute();
+
+                                                                // Update deposit status
+                                                                $stmt = $connection->prepare("
+                        UPDATE deposit 
+                        SET status = 'approved' 
+                        WHERE id = ?
+                    ");
+
+                                                                $stmt->bind_param("i", $deposit_id);
+                                                                $stmt->execute();
+
+                                                                $connection->commit();
+
+                                                                echo "<script>toastr.success('Deposit approved & user credited');</script>";
+                                                            } catch (Exception $e) {
+
+                                                                $connection->rollback();
+                                                                echo "<script>toastr.error('Approval failed');</script>";
+                                                            }
+                                                        }
+
+                                                        // ================= DECLINE =================
+                                                        if (isset($_POST['decline_deposit'])) {
+
+                                                            $stmt = $connection->prepare("
+                    UPDATE deposit 
+                    SET status = 'declined' 
+                    WHERE id = ?
+                ");
+
+                                                            $stmt->bind_param("i", $deposit_id);
+                                                            $stmt->execute();
+
+                                                            echo "<script>toastr.success('Deposit declined');</script>";
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            ?>
                                             <table id="default-ordering" class="table table-hover dataTable no-footer"
                                                 style="width:100%" role="grid" aria-describedby="default-ordering_info">
                                                 <thead>
@@ -2405,8 +2505,8 @@ include('../../server/auth/admin/index.php');
                                                             style="width: 247.672px;">DATE</th>
                                                         <th class="sorting" tabindex="0"
                                                             aria-controls="default-ordering" rowspan="1" colspan="1"
-                                                            aria-label="STATUS: activate to sort column ascending"
-                                                            style="width: 71.6094px;">STATUS</th>
+                                                            aria-label="ACTION: activate to sort column ascending"
+                                                            style="width: 71.6094px;">ACTION</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -2416,7 +2516,7 @@ include('../../server/auth/admin/index.php');
 
                                                     $query = "SELECT deposit.* , users.email,users.phone,users.full_name
                                                                 FROM deposit , users 
-                                                                WHERE deposit.user_id = users.id
+                                                                WHERE deposit.user_id = users.id AND deposit.status = 'pending'
                                                                 ORDER BY id DESC";
                                                     $result = mysqli_query($connection, $query);
                                                     $count = 0;
@@ -2440,8 +2540,33 @@ include('../../server/auth/admin/index.php');
                                                                         <td>$amount</td>
                                                                         <td>$reference</td>
                                                                         <td>$date</td>
-                                                                        <td class='text-center '>$status</td>
-                                                                    </tr>";
+                                                                        
+                                                                        <td class='text-center'>
+
+                                                                        <?php if ($status == 'pending') { ?>
+
+                                                                            <form  method='POST' style='display:inline;'>
+                                                                                <input type='text' name='deposit_id' value='$id'>
+                                                                                <button type='submit' name='approve_deposit'
+                                                                                    class='btn btn-sm btn-success'>
+                                                                                    Approve
+                                                                                </button>
+                                                                            </form>
+
+                                                                            <form method='POST' style='display:inline; margin-top:5px;'>
+                                                                                <input type='hidden' name='deposit_id' value='$id'>
+                                                                                <button type='submit' name='decline_deposit'
+                                                                                    class='btn btn-sm btn-danger mt-3'>
+                                                                                    Decline
+                                                                                </button>
+                                                                            </form>
+
+                                                                       
+
+                                                                        <?php } ?>
+
+                                                                        </td>
+                                                                        </tr>";
                                                     }
 
 
