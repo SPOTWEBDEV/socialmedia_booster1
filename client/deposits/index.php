@@ -341,14 +341,22 @@ while ($row = mysqli_fetch_assoc($result)) {
 
                                         let label = method.type;
 
+                                        if(method.type === "bank") {
+                                            label = "Mannual Bank Transfer";
+                                        } else if (method.type === "crypto") {
+                                            label = "Cryptocurrency";
+                                        } else if (method.type === "gateway") {
+                                            label = "Automatic Bank/Card Transfer";
+                                        }
+
                                         if (method.type === "bank") {
-                                            label += " - " + method.bank_name;
+                                            label += " - " + method.bank_name + ' (Mannual Transfer)';
                                         }
                                         if (method.type === "crypto") {
                                             label += " - " + method.wallet_name;
                                         }
                                         if (method.type === "gateway") {
-                                            label += " - " + method.gateway_name;
+                                            label += " - " + method.gateway_name + ' (Online Payment With Card or Transfer)';
                                         }
 
                                         div.innerText = label;
