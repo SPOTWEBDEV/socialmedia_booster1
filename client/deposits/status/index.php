@@ -287,12 +287,27 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
                                 </div>
 
                                 <!-- Button -->
-                                <div class="d-grid mt-4">
+                                <?php
+
+                                if ($paymentStatus === 'pending' && $_SESSION['verify_retry'] < 6) {
+                                    echo '<div class="alert alert-warning mt-4" role="alert">
+                                                Verifying payment... Please wait.
+                                            </div>';
+                                } elseif ($paymentStatus === 'declined') {
+                                    echo '<div class="alert alert-danger mt-4" role="alert">
+                                                Payment declined. Please try again or contact support.
+                                            </div>';
+                                } else {
+                                    echo '<div class="d-grid mt-4">
                                     <a href="<?= $domain ?>client/deposits/history"
                                         class="btn btn-primary btn-lg rounded-3">
                                         View Deposit History
                                     </a>
-                                </div>
+                                </div>';
+                                }
+
+                                ?>
+
 
                             </div>
                         </div>
