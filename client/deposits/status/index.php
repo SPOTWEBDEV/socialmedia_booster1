@@ -298,12 +298,12 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
                                                 Payment declined. Please try again or contact support.
                                             </div>';
                                 } else {
-                                    echo '<div class="d-grid mt-4">
-                                    <a href="<?= $domain ?>client/deposits/history"
-                                        class="btn btn-primary btn-lg rounded-3">
+                                    echo "<div class=\"d-grid mt-4\">
+                                    <a href=\"<?= $domain ?>client/deposits/history\"
+                                        class=\"btn btn-primary btn-lg rounded-3\">
                                         View Deposit History
                                     </a>
-                                </div>';
+                                </div>";
                                 }
 
                                 ?>
