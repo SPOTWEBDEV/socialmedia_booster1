@@ -96,8 +96,7 @@
                     <h1 class="">Sign In</h1>
                    
                     <p class="">Log in to your account to continue.</p>
-                 <!--   <img src="./../auth/asset/settings/favicon.png" class="navbar-logo" alt="logo" width="20%"> -->
-
+               
                     <form class="text-left" method="POST" id="form">
                         <div class="form">
                             

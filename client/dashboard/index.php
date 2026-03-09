@@ -95,6 +95,18 @@ function money($amount)
 
 <body class="dashboard">
 
+    <style>
+        .category-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+
     <div id="main-wrapper">
 
         <?php include("../include/header.php") ?>
@@ -110,7 +122,7 @@ function money($amount)
                                 <div class="col-xl-4">
                                     <div class="page-title-content">
                                         <h3>Dashboard</h3>
-                                        <p class="mb-2">Welcome <?= $username ?>
+                                        <p class="mb-2">Welcome <?= ($username != '' || $username != null) ? $fullname : $username ?></p>
                                     </div>
                                 </div>
                                 <div class="col-auto">
@@ -132,13 +144,18 @@ function money($amount)
                                 <div class="col-12 col-md-4">
                                     <div class="wallet-nav">
                                         <div class="wallet-nav-icon">
-                                            <span><i class="fi fi-rr-bank"></i></span>
+                                            <span><i class="fi fi-rr-wallet"></i></span>
                                         </div>
-                                        <div class="wallet-nav-text">
-                                            <h3>Balance</h3>
-                                            <p>₦<?= money($balance) ?></p>
+                                        <div class="wallet-nav-text d-flex flex-column gap-1">
+                                            <div>
+                                                <h3>Balance</h3>
+                                                <p>₦<?= money($balance) ?></p>
+                                            </div>
+
+                                            <a href="<?php echo $domain ?>client/deposits/"><span class="badge badge-warning py-2 bg-warning">Fund Account</span></a>
 
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-4">
@@ -277,6 +294,76 @@ function money($amount)
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row mt-4">
+
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Popular Order Categories</h4>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="row g-4">
+
+                                            <!-- Facebook -->
+                                            <div class="col-xl-3 col-md-6">
+                                                <a href="<?php echo $domain ?>client/orders/?category=facebook" class="text-decoration-none">
+                                                    <div class="card shadow-sm border-0 text-center p-2 h-20 category-card">
+                                                        <div class="mb-3">
+                                                            <i class="bi bi-facebook text-primary" style="font-size:40px"></i>
+                                                        </div>
+                                                        <h5 class="fw-bold">Facebook Boost</h5>
+                                                        <p class="text-muted small">Likes, Followers & Page Engagement</p>
+                                                    </div>
+                                                </a>
+                                            </div>
+
+                                            <!-- Instagram -->
+                                            <div class="col-xl-3 col-md-6">
+                                                <a href="<?php echo $domain ?>client/orders/?category=instagram" class="text-decoration-none">
+                                                    <div class="card shadow-sm border-0 text-center p-2 h-20 category-card">
+                                                        <div class="mb-3">
+                                                            <i class="bi bi-instagram text-danger" style="font-size:40px"></i>
+                                                        </div>
+                                                        <h5 class="fw-bold">Instagram Boost</h5>
+                                                        <p class="text-muted small">Followers, Likes & Reel Views</p>
+                                                    </div>
+                                                </a>
+                                            </div>
+
+                                            <!-- YouTube -->
+                                            <div class="col-xl-3 col-md-6">
+                                                <a href="<?php echo $domain ?>client/orders/?category=youtube" class="text-decoration-none">
+                                                    <div class="card shadow-sm border-0 text-center p-2 h-20 category-card">
+                                                        <div class="mb-3">
+                                                            <i class="bi bi-youtube text-danger" style="font-size:40px"></i>
+                                                        </div>
+                                                        <h5 class="fw-bold">YouTube Boost</h5>
+                                                        <p class="text-muted small">Subscribers, Views & Likes</p>
+                                                    </div>
+                                                </a>
+                                            </div>
+
+                                            <!-- TikTok -->
+                                            <div class="col-xl-3 col-md-6">
+                                                <a href="<?php echo $domain ?>client/orders/?category=tiktok" class="text-decoration-none">
+                                                    <div class="card shadow-sm border-0 text-center p-2 h-20 category-card">
+                                                        <div class="mb-3">
+                                                            <i class="bi bi-tiktok" style="font-size:40px"></i>
+                                                        </div>
+                                                        <h5 class="fw-bold">TikTok Boost</h5>
+                                                        <p class="text-muted small">Followers, Likes & Video Views</p>
+                                                    </div>
+                                                </a>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
@@ -289,7 +376,7 @@ function money($amount)
 
     </div>
 
-    
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"></script>

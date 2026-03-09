@@ -311,7 +311,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
                                 <script>
                                     const methods = <?= json_encode($payment_methods) ?>;
-                                    const url = "<?= $domain ?>server/api/etegram-init.php";
+                                   
 
                                     let selectedMethod = null;
                                     let selectedAmount = null;
@@ -342,21 +342,21 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         let label = method.type;
 
                                         if(method.type === "bank") {
-                                            label = "Mannual Bank Transfer";
+                                            label = "Bank Transfer";
                                         } else if (method.type === "crypto") {
                                             label = "Cryptocurrency";
                                         } else if (method.type === "gateway") {
-                                            label = "Automatic Bank/Card Transfer";
+                                            label = "Automatic Payment";
                                         }
 
                                         if (method.type === "bank") {
-                                            label += " - " + method.bank_name + ' (Mannual Transfer)';
+                                            label += " - " + method.bank_name +  ' ( ' + method.description + ' )';
                                         }
                                         if (method.type === "crypto") {
-                                            label += " - " + method.wallet_name;
+                                            label += " - " + method.wallet_name +  ' ( ' + method.description + ' )';
                                         }
                                         if (method.type === "gateway") {
-                                            label += " - " + method.gateway_name + ' (Online Payment With Card or Transfer)';
+                                            label += " - " + method.gateway_name +  ' ( ' + method.description + ' )';
                                         }
 
                                         div.innerText = label;
@@ -399,6 +399,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                 etegram(amount);
                                             } else if (gateway === "paystack") {
                                                 paystack(amount);
+                                            }else if(gateway === "cryptomus"){
+                                                cryptomus(amount);
+                                            } else {
+                                                alert("Gateway not supported");
                                             }
 
                                             return;
@@ -546,7 +550,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
                                     async function etegram(amount) {
 
-                                        const response = await fetch(url, {
+                                        const response = await fetch("<?= $domain ?>server/api/etegram-init.php", {
                                             method: "POST",
                                             headers: {
                                                 "Content-Type": "application/json"
@@ -563,6 +567,27 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             window.location.href = data.authorization_url;
                                         } else {
                                             alert("Etegram error");
+                                        }
+                                    }
+                                     async function cryptomus(amount) {
+
+                                        const response = await fetch( "<?= $domain ?>server/api/cryptomus-init.php", {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type": "application/json"
+                                            },
+                                            body: JSON.stringify({
+                                                amount,
+                                                user_id: "<?= $id ?>"
+                                            })
+                                        });
+
+                                        const data = await response.json();
+
+                                        if (data.status && data.authorization_url) {
+                                            window.location.href = data.authorization_url;
+                                        } else {
+                                            alert("cryptomus error");
                                         }
                                     }
 

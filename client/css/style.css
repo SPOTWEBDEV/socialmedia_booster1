@@ -15798,7 +15798,6 @@ div {
   border: 0px;
   padding: 0px;
   margin: 0px;
-  top: 25px !important;
   -webkit-box-shadow: 0 1.5rem 4rem rgba(22, 28, 45, 0.15);
           box-shadow: 0 1.5rem 4rem rgba(22, 28, 45, 0.15);
   border-radius: 5px;
@@ -16090,7 +16089,7 @@ div {
 .footer {
   background: #F6F9FC;
   padding: 20px 0px;
-  position: fixed;
+  /* position: fixed; */
   bottom: 0;
   right: 0;
   left: 80px;

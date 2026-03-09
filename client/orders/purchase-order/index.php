@@ -223,7 +223,7 @@ if (isset($_POST['send_message'])) {
 
                         <!-- Total Price -->
                         <div class="mb-3">
-                            <label class="form-label">Total Price</label>
+                            <label class="form-label">Total Price (₦)</label>
                             <input type="text" id="totalPrice"
                                 class="form-control bg-light fw-bold" readonly>
                         </div>
@@ -260,6 +260,8 @@ if (isset($_POST['send_message'])) {
 
             </div>
         </div>
+
+        <?php include("../../include/footer.php") ?>
 
 
 
@@ -316,14 +318,15 @@ if (isset($_POST['send_message'])) {
             const thirdPartyT = truncateDecimal(thirdParty, 4);
             const siteFeeT = truncateDecimal(siteFee, 4);
             const totalT = truncateDecimal(total, 4);
+            const totalTinNaria = truncateDecimal(total * <?= $rate ?>, 4);
 
 
-            console.log(`Third-party: ${thirdPartyT} | Site fee: ${siteFeeT} | Total: ${totalT}`)
+            console.log(`Third-party: ${thirdPartyT} | Site fee: ${siteFeeT} | Total: ${totalT} | Total in Naria: ${totalTinNaria}`);
 
             // document.querySelector('.overtotal').innerHTML =
             //     `Third-party: ${thirdPartyT} | Site fee: ${siteFeeT} | Total: ${totalT}`;
 
-            document.getElementById("totalPrice").value = totalT;
+            document.getElementById("totalPrice").value = totalTinNaria;
 
         });
     </script>

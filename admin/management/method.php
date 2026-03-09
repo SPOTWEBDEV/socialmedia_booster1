@@ -2444,7 +2444,15 @@ $refferalbonus = $settings['refferalbonus'];
                                             <div id="gatewayFields" style="display:none;">
                                                 <div class="form-group mb-3">
                                                     <label>Gateway Name</label>
-                                                    <input type="text" name="gateway_name" class="form-control">
+                                                    <input type="text" id="gateway_name" name="gateway_name" class="form-control">
+                                                </div>
+                                            </div>
+
+
+                                            <div  >
+                                                <div class="form-group mb-3">
+                                                    <label>Payment Description</label>
+                                                    <input id="description" type="text" name="description" class="form-control">
                                                 </div>
                                             </div>
 
@@ -2475,6 +2483,8 @@ $refferalbonus = $settings['refferalbonus'];
                                 $account_name   = trim($_POST['account_name'] ?? '');
 
                                 $gateway_name   = trim($_POST['gateway_name'] ?? '');
+
+                                $description     = trim($_POST['description'] ?? '');
 
                                 if (!$type) {
                                     echo "<script>toastr.error('Please select payment type');</script>";
@@ -2526,12 +2536,12 @@ $refferalbonus = $settings['refferalbonus'];
 
                                 $stmt = $connection->prepare("
     INSERT INTO payment_methods 
-    (type, wallet_name, wallet_address, bank_name, account_number, account_name, gateway_name, qr_code) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    (type, wallet_name, wallet_address, bank_name, account_number, account_name, gateway_name, qr_code , description) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
 
                                 $stmt->bind_param(
-                                    "ssssssss",
+                                    "sssssssss",
                                     $type,
                                     $wallet_name,
                                     $wallet_address,
@@ -2539,7 +2549,8 @@ $refferalbonus = $settings['refferalbonus'];
                                     $account_number,
                                     $account_name,
                                     $gateway_name,
-                                    $qr_code_name
+                                    $qr_code_name,
+                                    $description
                                 );
 
                                 if ($stmt->execute()) {
@@ -2730,10 +2741,13 @@ $refferalbonus = $settings['refferalbonus'];
                     // Show selected
                     if (this.value === "crypto") {
                         cryptoFields.style.display = "block";
+                        document.querySelector("#description").value ='Mannual Crypto Payment';
                     } else if (this.value === "bank") {
                         bankFields.style.display = "block";
+                        document.querySelector("#description").value ='Mannual Bank Payment';
                     } else if (this.value === "gateway") {
                         gatewayFields.style.display = "block";
+                        document.querySelector("#description").value ='Automatic Bank Or Crypto Payment';
                     }
 
                 });

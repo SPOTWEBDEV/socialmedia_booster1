@@ -3,9 +3,10 @@
 include('../server/connection.php');
 include_once('../server/api/boosting.php');
 
-$get = mysqli_query($connection, "SELECT  siteprice  FROM sitedetails  ORDER BY id LIMIT 1");
+$get = mysqli_query($connection, "SELECT  siteprice , rateusd  FROM sitedetails  ORDER BY id LIMIT 1");
 $data = mysqli_fetch_assoc($get);
 $site_price = floatval($data['siteprice'] ?? 0);
+$rate = floatval($data['rateusd'] ?? 0);
 
 
 ?>
@@ -114,9 +115,10 @@ $site_price = floatval($data['siteprice'] ?? 0);
                                                     $thirdParty = (1000 / 1000) * $service->rate;
                                                     $siteFee = (1000 / 1000) * $site_price;
                                                     $total = $thirdParty + $siteFee;
+                                                    $totalInNaira = $total * $rate;
 
 
-                                                    echo  '$' . $total;
+                                                    echo  '₦' . number_format($totalInNaira);
 
                                                     ?>
                                             <span class="month">Rate for 1,000</span>

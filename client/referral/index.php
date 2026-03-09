@@ -51,7 +51,7 @@ $whatsappLink = "https://wa.me/?text={$inviteMessage}";
     <meta charset="UTF-8">
     <title><?= $sitename ?> | Referral</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="<?= $domain ?>/images/favicon.png">
+    <link rel="icon" type="image/png" href="<?php echo $domain ?>assets/images/logo/favicon.png">
     <link rel="stylesheet" href="<?= $domain ?>client/css/style.css">
     <link rel="stylesheet" href="<?= $domain ?>client/vendor/toastr/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">

@@ -6,9 +6,18 @@ $services = $api->services();
 
 
 
-$get = mysqli_query($connection, "SELECT  siteprice  FROM sitedetails  ORDER BY id LIMIT 1");
+$get = mysqli_query($connection, "SELECT  siteprice , rateusd FROM sitedetails  ORDER BY id LIMIT 1");
 $data = mysqli_fetch_assoc($get);
 $site_price = floatval($data['siteprice'] ?? 0);
+$rateusd = floatval($data['rateusd'] ?? 0);
+
+if ($rateusd < 0) {
+    $rateusd = 1500;
+}
+
+
+$selectedCategory = $_GET['category'] ?? 'all';
+$selectedCategory = strtolower($selectedCategory);
 
 
 
@@ -64,54 +73,138 @@ $site_price = floatval($data['siteprice'] ?? 0);
                                         View Order History
                                     </button>
 
-                                    <button data-bs-toggle="dropdown"
-                                        class="px-5 py-2.5 bg-primary border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-100 transition">
-                                        How To Order?
-                                    </button>
-                                    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-end col-6 px-4 py-3">
+                                    <style>
+                                        .dropdown-container {
+                                            position: relative;
+                                            display: inline-block;
+                                        }
+
+                                        /* dropdown menu */
+                                        .custom-dropdown {
+                                            display: none;
+                                            /* position: absolute;
+                                            right: 0;
+                                            top: 45px; */
+                                            width: 450px;
+                                            background: #fff;
+                                            border-radius: 10px;
+                                            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+                                            padding: 15px;
+                                            z-index: 999;
+                                        }
+
+                                        .custom-dropdown.show {
+                                            display: block;
+                                        }
+
+                                        .custom-dropdown h4 {
+                                            margin-bottom: 10px;
+                                        }
+
+                                        .custom-dropdown .lists div {
+                                            padding: 6px 0;
+                                        }
+
+                                        @media (max-width: 575px) {
+                                            .custom-dropdown {
+                                                width: 100%;
+                                                /* right: 0;
+                                                left: 0; */
+                                            }
+                                        }
+                                    </style>
+
+
+                                    <div class="dropdown-container">
+
+                                        <button onclick="toggleDropdown('tutorialMenu')"
+                                            class="px-5 py-2.5 bg-primary border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-100 transition">
+                                            How To Order?
+                                        </button>
+
+
+
+                                    </div>
+
+                                    <div class="custom-dropdown" id="tutorialMenu">
 
                                         <h4>Tutorial Video</h4>
-                                        <div class="lists">
+
+                                        <ul>
+
                                             <?php
 
                                             $tutorial_stmt = $connection->prepare("
                                                     SELECT * 
                                                     FROM tutorial
-                                                    
-                                                ");
+                                                    ");
+
                                             $tutorial_stmt->execute();
                                             $tutorial = $tutorial_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-                                            if (!empty($tutorial)): $count = 0 ?>
-                                                <?php foreach ($tutorial as $tuto): $count++ ?>
+                                            if (!empty($tutorial)):
+                                                $count = 0;
+                                            ?>
 
-                                                    <div class="d-flex align-items-center">
+                                                <?php foreach ($tutorial as $tuto): $count++; ?>
 
-                                                        <div class="shrink-0">
-                                                            <div class="d-flex gap-2 g-2">
-                                                                <?= $count ?> :
+                                                    <li>
 
-                                                                <div class="d-flex gap-1 align-items-center">
-                                                                    <i class="<?= $tuto['icon'] ?>"></i>
-                                                                    <?= htmlspecialchars($tuto['title']) ?>
-                                                                </div>
 
-                                                                <a href="<?= $tuto['link'] ?>"><span class="text-danger">[Watch Now]</span></a>
-                                                        
-                                                            </div>
 
-                                                        </div>
-                                                    </div>
+
+                                                        <?= $count ?> :
+                                                        <?= htmlspecialchars($tuto['title']) ?>
+                                                        <a href="<?= $tuto['link'] ?>">
+                                                            <span class="text-danger">[Watch Now]</span>
+                                                        </a>
+
+
+
+
+
+                                                    </li>
+
+
 
                                                 <?php endforeach; ?>
+
                                             <?php else: ?>
+
                                                 <p class="text-center text-muted">No tutorial found</p>
+
                                             <?php endif; ?>
-                                        </div>
 
-
+                                        </ul>
 
                                     </div>
+
+
+                                    <script>
+                                        function toggleDropdown(id) {
+
+                                            document.querySelectorAll('.custom-dropdown').forEach(menu => {
+                                                if (menu.id !== id) {
+                                                    menu.classList.remove('show');
+                                                }
+                                            });
+
+                                            document.getElementById(id).classList.toggle('show');
+
+                                        }
+
+
+                                        /* close dropdown when clicking outside */
+                                        document.addEventListener("click", function(e) {
+
+                                            if (!e.target.closest(".dropdown-container")) {
+                                                document.querySelectorAll('.custom-dropdown').forEach(menu => {
+                                                    menu.classList.remove('show');
+                                                });
+                                            }
+
+                                        });
+                                    </script>
 
                                 </div>
                             </div>
@@ -133,12 +226,13 @@ $site_price = floatval($data['siteprice'] ?? 0);
                                         <div class="col-md-4">
                                             <select id="categoryFilter" class="form-select">
 
-                                                <option value="all">All Categories</option>
-                                                <option value="youtube">YouTube</option>
-                                                <option value="instagram">Instagram</option>
-                                                <option value="tiktok">TikTok</option>
-                                                <option value="facebook">Facebook</option>
-                                                <option value="telegram">Telegram</option>
+                                                <option value="all" <?= $selectedCategory == 'all' ? 'selected' : '' ?>>All Categories</option>
+                                                <option value="youtube" <?= $selectedCategory == 'youtube' ? 'selected' : '' ?>>YouTube</option>
+                                                <option value="instagram" <?= $selectedCategory == 'instagram' ? 'selected' : '' ?>>Instagram</option>
+                                                <option value="tiktok" <?= $selectedCategory == 'tiktok' ? 'selected' : '' ?>>TikTok</option>
+                                                <option value="facebook" <?= $selectedCategory == 'facebook' ? 'selected' : '' ?>>Facebook</option>
+                                                <option value="telegram" <?= $selectedCategory == 'telegram' ? 'selected' : '' ?>>Telegram</option>
+
                                             </select>
                                         </div>
 
@@ -166,6 +260,7 @@ $site_price = floatval($data['siteprice'] ?? 0);
                                     $thirdParty = (1000 / 1000) * $service->rate;
                                     $siteFee = (1000 / 1000) * $site_price;
                                     $total = $thirdParty + $siteFee;
+                                    $totalInNaria = $total * $rateusd;
                                 ?>
 
                                     <div class="col-xl-3 col-lg-4 col-md-6">
@@ -190,7 +285,7 @@ $site_price = floatval($data['siteprice'] ?? 0);
 
                                             <div class="mb-3">
                                                 <span class="fs-4 fw-bold">
-                                                    $<?= number_format($total, 2) ?>
+                                                    ₦<?= number_format($totalInNaria, 2) ?>
                                                 </span>
                                                 <small class="text-muted">/ 1,000</small>
                                             </div>
@@ -242,7 +337,7 @@ $site_price = floatval($data['siteprice'] ?? 0);
 
                 document.querySelectorAll('.service-card').forEach(card => {
 
-                    const col = card.closest('[class*="col-"]'); // hide column instead of card
+                    const col = card.closest('[class*="col-"]');
                     const name = card.dataset.name.toLowerCase();
                     const cardCategory = card.dataset.category.toLowerCase();
 
@@ -257,11 +352,15 @@ $site_price = floatval($data['siteprice'] ?? 0);
                     } else {
                         col.style.display = "none";
                     }
+
                 });
             }
 
             searchInput.addEventListener('keyup', filterServices);
             categoryFilter.addEventListener('change', filterServices);
+
+            // AUTO FILTER ON PAGE LOAD
+            filterServices();
 
         });
         // 🛒 Order Button → localStorage + redirect
