@@ -16089,10 +16089,6 @@ div {
 .footer {
   background: #F6F9FC;
   padding: 20px 0px;
-  /* position: fixed; */
-  bottom: 0;
-  right: 0;
-  left: 80px;
   border-radius: 6px;
 }
 .footer .copyright {

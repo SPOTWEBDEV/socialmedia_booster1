@@ -5,8 +5,7 @@ include('../../../server/auth/client.php');
 
 
 
-$projectID = '69875132aebfc2d5a7e9a1cc';
-$publicKey = 'pk_live-64e7b375350e4b519092237a4de9db2d';
+
 
 $rawAccessCode = $_GET['access-code'] ?? $_GET['code'] ?? '';
 $accessCode = explode('?', $rawAccessCode)[0];

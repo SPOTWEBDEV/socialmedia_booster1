@@ -1,15 +1,15 @@
 <?php
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-
 error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// error_reporting(E_ALL);
 
 // Don't show errors in browser
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
+// ini_set('display_errors', 0);
+// ini_set('display_startup_errors', 0);
 
 // Enable error logging
-ini_set('log_errors', 1);
+// ini_set('log_errors', 1);
 
 define("HOST", "localhost");
 
@@ -45,3 +45,12 @@ session_start();
 
 $projectID = '69875132aebfc2d5a7e9a1cc';
 $publicKey = 'pk_live-64e7b375350e4b519092237a4de9db2d';
+
+
+// cryptomus-init  => cryptomus payment method
+$API_KEY = "S8EhmaVKAkVktdkDqIGmqB3dLQvrDFIwXqtges7MtcXHyYtWRRhVvGP8o6G0uZgfJGlqPtUaoEAP4yMKvbRXCLjsATSNcg0plfYqUhV7txoZcCifIq5AXolkxBTXJQ9h";
+$MERCHANT_UUID = "bb7980be-eae1-4e3a-bc32-e344e367db0d";
+$data = [];
+$jsonData = json_encode($data);
+
+$sign = md5(base64_encode($jsonData) . $API_KEY);
