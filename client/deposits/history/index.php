@@ -143,8 +143,8 @@ $user_id = $_SESSION['user_id'];
                     </table>
 
 
-                    <script src="<?php echo $domain ?>/vendor/jquery/jquery.min.js"></script>
-                    <script src="<?php echo $domain ?>/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+                    <script src="<?php echo $domain ?>client/vendor/jquery/jquery.min.js"></script>
+                    <script src="<?php echo $domain ?>client/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
                     <!--  -->
                     <!--  -->
                     <script src="<?php echo $domain ?>client/js/scripts.js"></script>

@@ -291,7 +291,7 @@ $selectedCategory = strtolower($selectedCategory);
                                             </div>
 
                                             <button
-                                                class="btn btn-primary w-100 order-btn">
+                                                class="btn btn-primary w-100 order-btn loading-btn">
                                                 Order Now
                                             </button>
 
@@ -363,15 +363,28 @@ $selectedCategory = strtolower($selectedCategory);
             filterServices();
 
         });
+
+
+
         // 🛒 Order Button → localStorage + redirect
         document.querySelectorAll('.order-btn').forEach(button => {
             button.addEventListener('click', function() {
+                // store original text
+                let originalText = this.innerHTML;
+
+                // disable button
+                this.disabled = true;
+
+                // show loading spinner
+                this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
                 const card = this.closest('.service-card');
                 const serviceData = JSON.parse(card.dataset.service);
 
                 localStorage.setItem('selected_service', JSON.stringify(serviceData));
 
-                window.location.href = './purchase-order';
+                setTimeout(()=>{
+                   window.location.href = './purchase-order'; 
+                },2000)   
             });
         });
     </script>

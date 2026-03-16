@@ -3,7 +3,7 @@
 (function ($) {
     "use strict"
 
-    
+
     $(function () {
         for (
             var lc = window.location,
@@ -17,7 +17,7 @@
             ;
 
         ) {
-           
+
             if (!o.is("li")) break
             o = o.parent().addClass("show").parent().addClass("active")
         }
@@ -29,7 +29,7 @@
 
 
 window.addEventListener('load', function () {
-    let onpageLoad = localStorage.getItem("theme") || "light"; 
+    let onpageLoad = localStorage.getItem("theme") || "light";
     let element = document.body;
 
     if (onpageLoad) {
@@ -54,3 +54,45 @@ function themeToggle() {
         localStorage.setItem("theme", "dark-theme");
     }
 }
+
+// document.querySelectorAll(".loading-btn").forEach(button => {
+//     button.addEventListener("click", function () {
+
+//         console.log("CLICK")
+
+//         // store original text
+//         let originalText = this.innerHTML;
+
+//         // disable button
+//         this.disabled = true;
+
+//         // show loading spinner
+//         this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
+
+//         let form = this.closest("form");
+//         // if button is inside a form
+        // if (form) {
+        //     form.submit();
+        // }
+
+//         // restore text after process (optional)
+//         setTimeout(() => {
+//             this.disabled = false;
+//             this.innerHTML = originalText;
+//         }, 3000);
+
+//     });
+// });
+
+
+
+// console.log("CLICK")
+
+//         // store original text
+//         let originalText = this.innerHTML;
+
+//         // disable button
+//         this.disabled = true;
+
+//         // show loading spinner
+//         this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';

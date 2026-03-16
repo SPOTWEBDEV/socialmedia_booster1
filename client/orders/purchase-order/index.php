@@ -28,7 +28,8 @@ $site_price = floatval($data['siteprice'] ?? 0);
 // ===============================
 // Handle form submission
 // ===============================
-if (isset($_POST['send_message'])) {
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $service_id     = intval($_POST['service']);
     $order_name     = trim($_POST['order_name']);
@@ -51,7 +52,7 @@ if (isset($_POST['send_message'])) {
     $order_price = truncateDecimal($thirdPartyPrice + $siteFee, 4);
     $naria_price = truncateDecimal($order_price * $rate, 4);
 
-     echo "<script>alert('$siteFee');</script>";
+
 
 
 
@@ -70,7 +71,7 @@ if (isset($_POST['send_message'])) {
         "action" => "add"
     ]);
 
-    print_r($order);
+
 
     if (isset($order->error)) {
         echo "<script>alert('API Error: {$order->error}');</script>";
@@ -84,13 +85,16 @@ if (isset($_POST['send_message'])) {
 
     $orderId = $order->order;
 
+
+
+
     // Save order
     $stmt = $connection->prepare("
-    INSERT INTO user_orders
-    (user, service_id, order_name, third_party_charge, naria_price, order_price,
-     order_category, social_url, message, quanity, order_id , profit)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
-");
+        INSERT INTO user_orders
+        (user, service_id, order_name, third_party_charge, naria_price, order_price,
+        order_category, social_url, message, quanity, order_id , profit)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+    ");
 
 
     $stmt->bind_param(
@@ -242,13 +246,11 @@ if (isset($_POST['send_message'])) {
                         </div>
 
                         <!-- Submit -->
-                        <div class="d-grid">
-                            <button type="submit" name="send_message"
-                                class="btn btn-primary btn-lg rounded-3">
-                                <i class="bi bi-send-fill me-2"></i>
-                                Submit Order
-                            </button>
-                        </div>
+                        <button type="submit" name="send_message"
+                            class="btn btn-primary btn-lg rounded-3 loading-btn">
+                            <i class="bi bi-send-fill me-2"></i>
+                            Submit Order
+                        </button>
 
                     </form>
 
@@ -272,7 +274,7 @@ if (isset($_POST['send_message'])) {
     <!--  -->
     <!--  -->
     <script src="<?php echo $domain ?>client/js/scripts.js"></script>
-   <script>
+    <script>
         function truncateDecimal(num, decimals) {
             const factor = Math.pow(10, decimals);
             return Math.floor(num * factor) / factor;
@@ -327,6 +329,17 @@ if (isset($_POST['send_message'])) {
             //     `Third-party: ${thirdPartyT} | Site fee: ${siteFeeT} | Total: ${totalT}`;
 
             document.getElementById("totalPrice").value = totalTinNaria;
+
+        });
+
+        document.querySelector("form").addEventListener("submit", function(e) {
+
+            let btn = document.querySelector(".loading-btn");
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
+
+            return true;
 
         });
     </script>
