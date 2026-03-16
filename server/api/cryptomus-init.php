@@ -63,7 +63,7 @@ $data = [
     "currency" => $currency,
     "network" => $network,
     "order_id" => $order_id,
-    "url_callback" => "https://yourdomain.com/cryptomus-callback.php"
+    "url_callback" => $domain .  "server/api/cryptomus-callback.php"
 ];
 
 $jsonData = json_encode($data);

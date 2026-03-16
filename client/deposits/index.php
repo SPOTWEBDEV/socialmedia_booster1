@@ -563,6 +563,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 
                                         const data = await response.json();
 
+                                        console.log(data)
+
                                         if (data.status && data.authorization_url) {
                                             window.location.href = data.authorization_url;
                                         } else {
