@@ -92,13 +92,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $connection->prepare("
         INSERT INTO user_orders
         (user, service_id, order_name, third_party_charge, naria_price, order_price,
-        order_category, social_url, message, quanity, order_id , profit)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+order_category, social_url, message, quanity, order_id , profit, referral_bonus)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
     ");
 
 
     $stmt->bind_param(
-        "iisdddsssiss",
+        "iisdddsssissd",
         $id,
         $service_id,
         $order_name,
@@ -110,13 +110,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message,
         $quantity,
         $orderId,
-        $siteFee
+        $siteFee,
+        $referral_bonus
     );
 
 
     if ($stmt->execute()) {
 
+        // ===============================
+        // REFERRAL BONUS LOGIC
+        // ===============================
+
+        $getRef = $connection->prepare("SELECT referrer_id FROM users WHERE id = ?");
+        $getRef->bind_param("i", $id);
+        $getRef->execute();
+        $res = $getRef->get_result();
+        $userData = $res->fetch_assoc();
+
+        if (!empty($userData['referrer_id'])) {
+
+            $referrer_id = $userData['referrer_id'];
+
+            // Get bonus setting
+            $bonusQuery = $connection->query("SELECT refferalbonus FROM sitedetails LIMIT 1");
+            $bonusValue = 0;
+
+            if ($bonusQuery && $bonusQuery->num_rows > 0) {
+                $bonusValue = floatval($bonusQuery->fetch_assoc()['refferalbonus']);
+            }
+
+            // ✅ RECOMMENDED: percentage from your profit
+            $referral_bonus = ($siteFee * $bonusValue) / 100;
+
+            if ($referral_bonus > 0) {
+
+                // Give bonus to referrer
+                $updateRef = $connection->prepare("
+                UPDATE users 
+                SET referral_earnings = referral_earnings + ?, 
+                    balance = balance + ? 
+                WHERE id = ?
+            ");
+                $updateRef->bind_param("ddi", $referral_bonus, $referral_bonus, $referrer_id);
+                $updateRef->execute();
+
+               
+
+                // Save bonus in this order
+                $saveBonus = $connection->prepare("
+                UPDATE user_orders SET referral_bonus = ? WHERE order_id = ?
+            ");
+                $saveBonus->bind_param("ds", $referral_bonus, $orderId);
+                $saveBonus->execute();
+
+                // Notify
+                $message = "You earned ₦$referral_bonus referral bonus from an order.";
+                $notify = $connection->prepare("
+                INSERT INTO notifications (type, user_id, message) 
+                VALUES ('system', ?, ?)
+            ");
+                $notify->bind_param("is", $referrer_id, $message);
+                $notify->execute();
+            }
+        }
+
+        // ===============================
+        // UPDATE PROFIT (VERY IMPORTANT)
+        // ===============================
+
+        $realProfit = $siteFee - $referral_bonus;
+
+        $updateProfit = $connection->prepare("
+        UPDATE user_orders SET profit = ? WHERE order_id = ?
+        ");
+        $updateProfit->bind_param("ds", $realProfit, $orderId);
+        $updateProfit->execute();
+
+        // ===============================
         // Deduct balance
+        // ===============================
+
         $deduct = $connection->prepare(
             "UPDATE users SET balance = balance - ? WHERE id = ?"
         );
@@ -124,10 +197,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $deduct->execute();
 
         echo "<script>
-            localStorage.removeItem('selected_service');
-            alert('Order placed successfully!');
-            window.location.href = '../my-order/';
-        </script>";
+        localStorage.removeItem('selected_service');
+        alert('Order placed successfully!');
+        window.location.href = '../my-order/';
+    </script>";
     } else {
         echo "<script>alert('Failed to save order');</script>";
     }

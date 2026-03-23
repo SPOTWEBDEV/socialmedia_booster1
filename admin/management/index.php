@@ -2414,7 +2414,7 @@ $refferalbonus = $settings['refferalbonus'];
                                                     </div>
 
                                                     <div class="form-group">
-                                                        <label>Referral Bonus (₦)</label>
+                                                        <label>Referral Bonus (%)</label>
                                                         <input type="number" step="0.01" class="form-control mb-4"
                                                             name="refferalbonus"
                                                             value="<?= htmlspecialchars($refferalbonus) ?>">

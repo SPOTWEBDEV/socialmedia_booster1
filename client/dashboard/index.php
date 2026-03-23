@@ -91,6 +91,7 @@ function money($amount)
     <link rel="icon" type="image/png" href="<?php echo $domain ?>assets/images/logo/favicon.png">
     <link rel="stylesheet" href="<?php echo $domain ?>client/css/style.css">
     <link rel="stylesheet" href="<?php echo $domain ?>client/vendor/toastr/toastr.min.css">
+    <script defer src="<?php echo $domain ?>client/js/scripts.js"></script>
 </head>
 
 <body class="dashboard">
@@ -384,7 +385,7 @@ function money($amount)
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo $domain ?>client/vendor/jquery/jquery.min.js"></script>
 
-    <script src="<?php echo $domain ?>client/js/scripts.js"></script>
+
 </body>
 
 </html>

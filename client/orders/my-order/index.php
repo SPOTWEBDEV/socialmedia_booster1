@@ -85,7 +85,7 @@ $result = $stmt->get_result();
                                     <th>CATEGORY</th>
                                     <th>AMOUNT</th>
                                     <th>DATE</th>
-                                    <th>StART COUNT</th>
+                                    <th>START COUNT</th>
                                     <th>REMAINS</th>
                                     <th>API STATUS</th>
                                     

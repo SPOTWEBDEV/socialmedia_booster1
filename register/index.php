@@ -80,37 +80,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $currency
             );
 
-
-
-
             if ($stmt->execute()) {
 
-                // Credit referral bonus if there is a referrer
-                if ($referrer_id) {
-                    // Fetch referral bonus from sitedetails table
-                    $bonusQuery = $connection->query("SELECT refferalbonus FROM sitedetails LIMIT 1");
-                    $bonus = 0;
-                    if ($bonusQuery && $bonusQuery->num_rows > 0) {
-                        $bonus = $bonusQuery->fetch_assoc()['refferalbonus'];
-                    }
-
-                    // Update referrer's referral earnings
-                    $update = $connection->prepare("UPDATE users SET referral_earnings = referral_earnings + ? WHERE id = ?");
-                    $update->bind_param("di", $bonus, $referrer_id);
-                    $update->execute();
-                    $update->close();
-
-                    // Notify referrer
-                    $refNotify = $connection->prepare("
-                        INSERT INTO notifications (type, user_id, message) 
-                        VALUES ('system', ?, ?)
-                    ");
-
-                    $refMessage = "You earned ₦$bonus referral bonus from a new signup.";
-                    $refNotify->bind_param("is", $referrer_id, $refMessage);
-                    $refNotify->execute();
-                    $refNotify->close();
-                }
 
                 $newUserId = $stmt->insert_id;
                 // Insert account created notification

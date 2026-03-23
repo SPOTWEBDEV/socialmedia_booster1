@@ -220,7 +220,7 @@ if (strpos(strtolower($notif['message']), 'failed') !== false) {
 </div>
 </div>
 
-<?php include('../../include/support.php'); ?>
+<?php include(__DIR__ . '/../../include/support.php'); ?>
 
 
 <script>
