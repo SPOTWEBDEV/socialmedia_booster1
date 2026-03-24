@@ -130,7 +130,7 @@ $whatsappLink = "https://wa.me/?text={$inviteMessage}";
                             <div class="card-body d-flex justify-content-between">
                                 <div>
                                     <p>Total Earnings</p>
-                                    <h3>₦<?= number_format($referralSummary['total_earned'], 0) ?></h3>
+                                    <h3>₦<?= $referral_earnings ?></h3>
                                 </div>
                                 <i class="bi bi-cash-stack fs-1 text-success"></i>
                             </div>
