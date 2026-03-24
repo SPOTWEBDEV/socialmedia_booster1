@@ -3,31 +3,17 @@ include("../../../server/connection.php");
 include('../../../server/auth/client.php');
 include_once('../../../server/api/boosting.php');
 
-function truncateDecimal($number, $precision = 4)
-{
+// Function to truncate decimal values
+function truncateDecimal($number, $precision = 4) {
     $factor = pow(10, $precision);
     return floor($number * $factor) / $factor;
 }
 
-
-
-$get = mysqli_query($connection, "SELECT  siteprice ,  rateusd  FROM sitedetails  ORDER BY id LIMIT 1");
+// Fetch site price and USD rate
+$get = mysqli_query($connection, "SELECT siteprice, rateusd FROM sitedetails ORDER BY id LIMIT 1");
 $data = mysqli_fetch_assoc($get);
 $site_price = floatval($data['siteprice'] ?? 0);
 $rate = floatval($data['rateusd'] ?? 0);
-
-
-
-// ===============================
-// Fetch site price
-// ===============================
-$get = mysqli_query($connection, "SELECT  siteprice  FROM sitedetails  ORDER BY id LIMIT 1");
-$data = mysqli_fetch_assoc($get);
-$site_price = floatval($data['siteprice'] ?? 0);
-
-// ===============================
-// Handle form submission
-// ===============================
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -38,29 +24,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $social_url     = trim($_POST['order_url']);
     $message        = trim($_POST['message']);
     $quantity       = intval($_POST['quanity']);
+    $account        = trim($_POST['account']);
 
+    // Basic validation
     if ($service_id <= 0 || $quantity <= 0 || $order_rate <= 0) {
-        echo "<script>alert('Invalid order data');</script>";
-        exit;
+        echo "<script>alert('Invalid order data'); window.history.back();</script>";
+        return;
     }
 
-    // Price calculation (SERVER SIDE)
+    // Calculate pricing
     $thirdPartyPrice = ($quantity / 1000) * $order_rate;
-    $siteFee         = truncateDecimal(($quantity / 1000) * $site_price);
+    $siteFee         = truncateDecimal(($quantity / 1000) * $site_price); // USD
+    $sub_price       = truncateDecimal($thirdPartyPrice, 4);
+    $order_price     = truncateDecimal($thirdPartyPrice + $siteFee, 4); // USD
+    $naria_price     = truncateDecimal($order_price * $rate, 4); // Naira
 
-    $sub_price   = truncateDecimal($thirdPartyPrice, 4);
-    $order_price = truncateDecimal($thirdPartyPrice + $siteFee, 4);
-    $naria_price = truncateDecimal($order_price * $rate, 4);
-
-
-
-
-
-
-
-    if ($naria_price > $balance) {
-        echo "<script>alert('Insufficient balance');</script>";
-        exit;
+    // ===============================
+    // Check user balance based on selected account
+    // ===============================
+    if ($account === 'main') {
+        if ($naria_price > $balance) {
+            echo "<script>alert('Insufficient main balance'); window.history.back();</script>";
+            return;
+        }
+    } elseif ($account === 'refferals') {
+        if ($naria_price > $referral_earnings) {
+            echo "<script>alert('Insufficient referral balance'); window.history.back();</script>";
+            return;
+        }
+    } else {
+        echo "<script>alert('Invalid account selected'); window.history.back();</script>";
+        return;
     }
 
     // Send order to API
@@ -68,41 +62,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'service'  => $service_id,
         'link'     => $social_url,
         'quantity' => $quantity,
-        "action" => "add"
+        'action'   => 'add'
     ]);
 
-
-
     if (isset($order->error)) {
-        echo "<script>alert('API Error: {$order->error}');</script>";
-        exit;
+        echo "<script>alert('API Error: {$order->error}'); window.history.back();</script>";
+        return;
     }
 
     if (!isset($order->order)) {
-        echo "<script>alert('Unexpected API response');</script>";
-        exit;
+        echo "<script>alert('Unexpected API response'); window.history.back();</script>";
+        return;
     }
 
     $orderId = $order->order;
 
+    // ===============================
+    // REFERRAL BONUS LOGIC (Naira)
+    // ===============================
+    $referral_bonus = 0;
+    $getRef = $connection->prepare("SELECT referrer_id FROM users WHERE id = ?");
+    $getRef->bind_param("i", $id);
+    $getRef->execute();
+    $res = $getRef->get_result();
+    $userData = $res->fetch_assoc();
 
+    if (!empty($userData['referrer_id'])) {
+        $referrer_id = $userData['referrer_id'];
 
+        $bonusQuery = $connection->query("SELECT refferalbonus FROM sitedetails LIMIT 1");
+        $bonusValue = 0;
+        if ($bonusQuery && $bonusQuery->num_rows > 0) {
+            $bonusValue = floatval($bonusQuery->fetch_assoc()['refferalbonus']);
+        }
 
-    // Save order
+        // Referral bonus in USD
+        $referral_bonus_usd = ($siteFee * $bonusValue) / 100;
+
+        // Convert to Naira
+        $referral_bonus = truncateDecimal($referral_bonus_usd * $rate, 2);
+
+        if ($referral_bonus > 0) {
+            // Credit referrer in Naira
+            $updateRef = $connection->prepare("
+                UPDATE users
+                SET referral_earnings = referral_earnings + ?
+                WHERE id = ?
+            ");
+            $updateRef->bind_param("di", $referral_bonus, $referrer_id);
+            $updateRef->execute();
+
+            $insertReferral = $connection->prepare("
+                INSERT INTO referrals (user_id, from_user, amount)
+                VALUES (?, ?, ?)
+            ");
+            $insertReferral->bind_param("iid", $referrer_id, $id, $referral_bonus);
+            $insertReferral->execute();
+
+            $notify = $connection->prepare("
+                INSERT INTO notifications (type, user_id, message)
+                VALUES ('system', ?, ?)
+            ");
+            $msg = "You earned ₦$referral_bonus referral bonus from an order.";
+            $notify->bind_param("is", $referrer_id, $msg);
+            $notify->execute();
+        }
+    }
+
+    // ===============================
+    // SAVE ORDER
+    // ===============================
+    $realProfit = $siteFee - $referral_bonus_usd; // USD profit
     $stmt = $connection->prepare("
         INSERT INTO user_orders
         (user, service_id, order_name, third_party_charge, naria_price, order_price,
-order_category, social_url, message, quanity, order_id , profit, referral_bonus)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+         order_category, social_url, message, quanity, order_id, profit, referral_bonus)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
-
-
     $stmt->bind_param(
         "iisdddsssissd",
         $id,
         $service_id,
         $order_name,
-        $sub_price,     // third-party charge
+        $sub_price,
         $naria_price,
         $order_price,
         $order_category,
@@ -110,104 +152,30 @@ order_category, social_url, message, quanity, order_id , profit, referral_bonus)
         $message,
         $quantity,
         $orderId,
-        $siteFee,
+        $realProfit,
         $referral_bonus
     );
+    $stmt->execute();
 
-
-    if ($stmt->execute()) {
-
-        // ===============================
-        // REFERRAL BONUS LOGIC
-        // ===============================
-
-        $getRef = $connection->prepare("SELECT referrer_id FROM users WHERE id = ?");
-        $getRef->bind_param("i", $id);
-        $getRef->execute();
-        $res = $getRef->get_result();
-        $userData = $res->fetch_assoc();
-
-        if (!empty($userData['referrer_id'])) {
-
-            $referrer_id = $userData['referrer_id'];
-
-            // Get bonus setting
-            $bonusQuery = $connection->query("SELECT refferalbonus FROM sitedetails LIMIT 1");
-            $bonusValue = 0;
-
-            if ($bonusQuery && $bonusQuery->num_rows > 0) {
-                $bonusValue = floatval($bonusQuery->fetch_assoc()['refferalbonus']);
-            }
-
-            // ✅ RECOMMENDED: percentage from your profit
-            $referral_bonus = ($siteFee * $bonusValue) / 100;
-
-            if ($referral_bonus > 0) {
-
-                // Give bonus to referrer
-                $updateRef = $connection->prepare("
-                UPDATE users 
-                SET referral_earnings = referral_earnings + ?, 
-                    balance = balance + ? 
-                WHERE id = ?
-            ");
-                $updateRef->bind_param("ddi", $referral_bonus, $referral_bonus, $referrer_id);
-                $updateRef->execute();
-
-               
-
-                // Save bonus in this order
-                $saveBonus = $connection->prepare("
-                UPDATE user_orders SET referral_bonus = ? WHERE order_id = ?
-            ");
-                $saveBonus->bind_param("ds", $referral_bonus, $orderId);
-                $saveBonus->execute();
-
-                // Notify
-                $message = "You earned ₦$referral_bonus referral bonus from an order.";
-                $notify = $connection->prepare("
-                INSERT INTO notifications (type, user_id, message) 
-                VALUES ('system', ?, ?)
-            ");
-                $notify->bind_param("is", $referrer_id, $message);
-                $notify->execute();
-            }
-        }
-
-        // ===============================
-        // UPDATE PROFIT (VERY IMPORTANT)
-        // ===============================
-
-        $realProfit = $siteFee - $referral_bonus;
-
-        $updateProfit = $connection->prepare("
-        UPDATE user_orders SET profit = ? WHERE order_id = ?
-        ");
-        $updateProfit->bind_param("ds", $realProfit, $orderId);
-        $updateProfit->execute();
-
-        // ===============================
-        // Deduct balance
-        // ===============================
-
-        $deduct = $connection->prepare(
-            "UPDATE users SET balance = balance - ? WHERE id = ?"
-        );
+    // ===============================
+    // DEDUCT USER BALANCE BASED ON SELECTED ACCOUNT
+    // ===============================
+    if ($account === 'main') {
+        $deduct = $connection->prepare("UPDATE users SET balance = balance - ? WHERE id = ?");
         $deduct->bind_param("di", $naria_price, $id);
         $deduct->execute();
+    } elseif ($account === 'refferals') {
+        $deduct = $connection->prepare("UPDATE users SET referral_earnings = referral_earnings - ? WHERE id = ?");
+        $deduct->bind_param("di", $naria_price, $id);
+        $deduct->execute();
+    }
 
-        echo "<script>
+    echo "<script>
         localStorage.removeItem('selected_service');
         alert('Order placed successfully!');
         window.location.href = '../my-order/';
     </script>";
-    } else {
-        echo "<script>alert('Failed to save order');</script>";
-    }
 }
-
-
-
 ?>
 
 
@@ -266,6 +234,14 @@ order_category, social_url, message, quanity, order_id , profit, referral_bonus)
 
 
                     <form method="POST">
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Account</label>
+                            <select name="account" class="form-control bg-light name="" id="">
+                                <option value=" main">Main Balance - <?php echo number_format($balance, 4) ?></option>
+                                <option value="refferals">Refferals Balance <?php echo number_format($referral_earnings, 4) ?></option>
+                            </select>
+                        </div>
 
                         <!-- Category -->
                         <div class="mb-3">

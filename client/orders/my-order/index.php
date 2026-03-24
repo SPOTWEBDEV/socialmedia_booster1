@@ -111,20 +111,18 @@ $result = $stmt->get_result();
 
                                             ?>
 
-                                            <td><?php   echo ($services->start_count != '' || $services->start_count != null)? $services->start_count : '0' ?></td>
-                                            <td><?php   echo $services->remains ?? '-' ?></td>
-
-
-
+                                            <td><?php echo ($services->start_count != '' || $services->start_count != null)? $services->start_count : '0' ?></td>
+                                            <td><?php echo $services->remains ?? '-' ?></td>
                                             <td>
-                                                <span class="badge
-                                                    <?php
-                                                    if ($services->status === 'Completed') echo 'bg-success';
-                                                    elseif ($services->status === 'Processing' || $services->status === 'Pending') echo 'bg-danger';
-                                                    else echo 'bg-warning';
-                                                    ?>">
-                                                    <?= ucfirst($services->status) ?>
-                                                </span>
+                                               
+                                            <span class="badge
+                                                <?php
+                                                if ($services->status === 'Completed') echo 'bg-success';
+                                                elseif ($services->status === 'Processing' || $services->status === 'Pending') echo 'bg-danger';
+                                                else echo 'bg-warning';
+                                                ?>">
+                                                <?= ucfirst($services->status) ?>
+                                            </span>
                                             </td>
                                             
                                         </tr>

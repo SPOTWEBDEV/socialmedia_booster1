@@ -140,9 +140,10 @@ function money($amount)
                 <div class="wallet-tab">
                     <div class="row g-0">
                         <div class="col-12">
-                            <div class="nav d-flex flex-wrap justify-content-between gap-1">
 
-                                <div class="col-12 col-md-4">
+
+                            <div class="row">
+                                <div class="col-12 col-md-6">
                                     <div class="wallet-nav">
                                         <div class="wallet-nav-icon">
                                             <span><i class="fi fi-rr-wallet"></i></span>
@@ -159,7 +160,28 @@ function money($amount)
 
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-6">
+                                    <div class="wallet-nav">
+                                        <div class="wallet-nav-icon">
+                                            <span><i class="fi fi-rr-wallet"></i></span>
+                                        </div>
+                                        <div class="wallet-nav-text d-flex flex-column gap-1">
+                                            <div>
+                                                <h3>Referrals Balance</h3>
+                                                <p>₦<?= money($referral_earnings) ?></p>
+                                            </div>
+
+                                            <a href="<?php echo $domain ?>client/referral/"><span class="badge badge-warning py-2 bg-success">Referal a user</span></a>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="nav d-flex flex-wrap  gap-1">
+                                <div class="col-12 col-md-3">
                                     <div class="wallet-nav">
                                         <div class="wallet-nav-icon">
                                             <span><i class="fi fi-rr-bank"></i></span>
@@ -191,14 +213,13 @@ function money($amount)
                                         </div>
                                         <div class="wallet-nav-text">
                                             <h3>Streak Days</h3>
-                                            <p><?= $current_streak ?> Day<?= $current_streak > 1 ? 's' : '' ?></p>
+                                            <div class="d-flex align-items-center">
+                                                <p><?= $current_streak ?> Day<?= $current_streak > 1 ? 's' : '' ?></p>
                                             <small>High: <?= $highest_streak ?> Day<?= $highest_streak > 1 ? 's' : '' ?></small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-
-
                             </div>
 
 
@@ -235,12 +256,22 @@ function money($amount)
                                             FROM user_orders
                                             WHERE user = ?
 
+                                            UNION ALL
+
+                                            SELECT id,
+                                                'Referrals' AS type,
+                                                amount ,
+                                                created_at AS date,
+                                                'credited' As status
+                                            FROM referrals
+                                            WHERE user_id = ?
+
                                             ORDER BY date DESC
                                             LIMIT 10
                                         ";
 
                                         $stmt = mysqli_prepare($connection, $sql);
-                                        mysqli_stmt_bind_param($stmt, "ii", $id, $id);
+                                        mysqli_stmt_bind_param($stmt, "iii", $id, $id, $id);
                                         mysqli_stmt_execute($stmt);
                                         $result = mysqli_stmt_get_result($stmt);
 
@@ -277,7 +308,7 @@ function money($amount)
                                                             <td><?= date("Y-m-d", strtotime($transaction['date'])) ?></td>
                                                             <td>
                                                                 <span class="badge text-white 
-                                                                    <?= $transaction['status'] == 'pending' ? 'bg-warning' : ($transaction['status'] == 'completed' || $transaction['status'] == 'approved' ? 'bg-success' : 'bg-danger') ?>">
+                                                                    <?= $transaction['status'] == 'pending' ? 'bg-warning' : ($transaction['status'] == 'completed' || $transaction['status'] == 'approved' || $transaction['status'] == 'credited' ? 'bg-success' : 'bg-danger') ?>">
                                                                     <?= ucfirst($transaction['status']) ?>
                                                                 </span>
                                                             </td>

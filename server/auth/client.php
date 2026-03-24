@@ -24,6 +24,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != "") {
             $status           = sanitize($row['status']);
             $status_message   = sanitize($row['status_message'], '');
             $balance = $row['balance'];
+            $referral_earnings = $row['referral_earnings'];
             $country = $row['country'];
             $currency = $row['currency'];
             $timezone = $row['timezone'];

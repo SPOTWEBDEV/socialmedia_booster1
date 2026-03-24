@@ -2400,7 +2400,7 @@ include('../../server/auth/admin/index.php');
                                                         <th class="sorting" tabindex="0"
                                                             aria-controls="default-ordering" rowspan="1" colspan="1"
                                                             aria-label="ORDER PRICE: activate to sort column ascending"
-                                                            style="width: 173.875px;">ORDER PRICE</th>
+                                                            style="width: 173.875px;">ORDER PRICE ($)</th>
                                                         <th class="sorting" tabindex="0"
                                                             aria-controls="default-ordering" rowspan="1" colspan="1"
                                                             aria-label="QUANITY: activate to sort column ascending"
@@ -2447,11 +2447,11 @@ include('../../server/auth/admin/index.php');
                                                                         <td>$email</td>
                                                                         <td>$order_name</td>
                                                                         <td>$order_category</td>
-                                                                        <td>$amount</td>
+                                                                        <td>$$amount</td>
                                                                         <td>$quanity</td>
                                                                         
                                                                         <td>$date</td>
-                                                                        <td class='text-center '><button class='btn btn-primary'>View</button></td>
+                                                                         <td class='text-center'><a href='./view.php?id=$id' class='btn btn-primary'>View</a></td>
                                                                     </tr>";
                                                     }
 
