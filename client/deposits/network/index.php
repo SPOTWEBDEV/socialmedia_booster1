@@ -277,7 +277,7 @@ curl_close($ch);
                                             </button>
                                         </div>
 
-                                        <div class="modal-body" id="methodList"></div>
+                                        <div style="overflow-y: auto;" class="modal-body" id="methodList"></div>
 
                                     </div>
                                 </div>
@@ -289,20 +289,7 @@ curl_close($ch);
                                     // const method = JSON.parse(<?= json_encode($payment_methods) ?>);
                                     const method = <?= json_encode($payment_methods) ?>;
 
-                                    console.log(method)
-
-                                    // const allowedNetworks = [
-                                    //     "bitcoin",
-                                    //     "ethereum",
-                                    //     "tron",
-                                    //     "bsc",
-                                    //     "solana",
-                                    //     "polygon",
-                                    //     "litecoin",
-                                    //     "doge",
-                                    //     "ton",
-                                    //     "xrp"
-                                    // ];
+                                    console.log(method);
 
                                     const allowedNetworks = [
                                         "BTC",
@@ -316,12 +303,11 @@ curl_close($ch);
                                     ];
 
                                     const methods = method.result.filter(m =>
-                                        allowedNetworks.includes(m.network)
+                                        allowedNetworks.includes(m.network) &&
+                                        m.network === m.currency
                                     );
 
-
-
-                                    console.log(methods)
+                                    console.log(methods);
 
 
                                     let selectedMethod = null;
@@ -419,7 +405,7 @@ curl_close($ch);
 
                                         const data = JSON.parse(text);
 
-                                     
+
 
                                         console.log(data)
 

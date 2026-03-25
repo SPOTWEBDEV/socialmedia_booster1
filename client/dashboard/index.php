@@ -171,7 +171,7 @@ function money($amount)
                                                 <p>₦<?= money($referral_earnings) ?></p>
                                             </div>
 
-                                            <a href="<?php echo $domain ?>client/referral/"><span class="badge badge-warning py-2 bg-success">Referal a user</span></a>
+                                            <a href="<?php echo $domain ?>client/referral/"><span class="badge badge-warning py-2 bg-success">Refer a user</span></a>
 
                                         </div>
 
