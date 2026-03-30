@@ -6,13 +6,9 @@ header('Content-Type: application/json');
 
 $body = json_decode(file_get_contents("php://input"), true);
 
-$amount  = floatval($body['amount'] ?? 0);
 $user_id = intval($body['user_id'] ?? 0);
 
-if ($amount <= 0) {
-    echo json_encode(["error" => "Invalid amount"]);
-    exit;
-}
+
 
 if ($user_id <= 0) {
     echo json_encode(["error" => "Invalid user"]);
@@ -109,11 +105,11 @@ if ($result['state'] == 0) {
     $access_code = $result['result']['uuid'];
 
     $stmt = $connection->prepare(
-        "INSERT INTO deposit (user_id, reference, amount, currency, network, status, response, access_code)
-        VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)"
+        "INSERT INTO deposit (user_id, reference, currency, network, status, response, access_code)
+        VALUES (?, ?, ?, ?, 'pending', ?, ?)"
     );
 
-    $stmt->bind_param("isdssss", $user_id, $order_id, $amount, $currency, $network, $response, $access_code);
+    $stmt->bind_param("isdssss", $user_id, $order_id, $currency, $network, $response, $access_code);
     $stmt->execute();
 
     echo json_encode([
@@ -121,14 +117,11 @@ if ($result['state'] == 0) {
         "wallet_address" => $wallet,
         "network" => $network,
         "currency" => $currency,
-        "amount" => $amount,
         "authorization_url" => $url
     ]);
 
 } else {
-
     echo json_encode([
         "error" => $result
     ]);
-
 }

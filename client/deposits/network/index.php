@@ -231,7 +231,7 @@ curl_close($ch);
                             <div class="row g-4">
 
                                 <form id="depositForm">
-                                    <!-- SUBMIT AMOUNT -->
+                                    
                                     <div class="col-12">
                                         <div class="card">
                                             <div class="card-header">
@@ -250,12 +250,7 @@ curl_close($ch);
                                                     <input type="hidden" id="paymentMethodInput">
                                                 </div>
 
-                                                <!-- Amount -->
-                                                <div class="mb-3">
-                                                    <label class="form-label">Enter Amount</label>
-                                                    <input name="amount" id="depositAmount" type="number" class="form-control" placeholder="Enter amount">
-                                                </div>
-
+                                               
 
 
                                                 <button type="submit" class="btn btn-primary">Proceed</button>
@@ -311,7 +306,7 @@ curl_close($ch);
 
 
                                     let selectedMethod = null;
-                                    let selectedAmount = null;
+                                   
 
                                     /* ================= METHOD MODAL ================= */
 
@@ -372,20 +367,12 @@ curl_close($ch);
                                     document.getElementById("depositForm").addEventListener("submit", async function(e) {
 
                                         e.preventDefault();
-
-                                        const amount = parseFloat(document.getElementById("depositAmount").value);
-
-                                        if (!amount || amount <= 0) {
-                                            toastr.error("Enter valid amount");
-                                            return;
-                                        }
-
                                         if (!selectedMethod) {
                                             toastr.error("Select payment method");
                                             return;
                                         }
 
-                                        amount;
+                                        
 
                                         const response = await fetch("<?= $domain ?>server/api/cryptomus-init.php", {
                                             method: "POST",
@@ -393,7 +380,6 @@ curl_close($ch);
                                                 "Content-Type": "application/json"
                                             },
                                             body: JSON.stringify({
-                                                amount,
                                                 user_id: "<?= $id ?>",
                                                 network: selectedMethod.network,
                                                 currency: selectedMethod.currency
@@ -410,15 +396,10 @@ curl_close($ch);
                                         console.log(data)
 
                                         if (data.status && data.authorization_url) {
-                                            window.location.href = data.authorization_url;
+                                            window.open(data.authorization_url, "_blank");
                                         } else {
                                             alert("cryptomus error");
                                         }
-
-
-
-
-
                                     });
                                 </script>
 

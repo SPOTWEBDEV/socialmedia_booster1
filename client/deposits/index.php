@@ -224,12 +224,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             </div>
                                             <div class="card-body">
 
-                                                <!-- Amount -->
-                                                <div class="mb-3">
-                                                    <label class="form-label">Enter Amount</label>
-                                                    <input name="amount" id="depositAmount" type="number" class="form-control" placeholder="Enter amount">
-                                                </div>
-
+                                                
                                                 <!-- Payment Methods -->
                                                 <div class="mb-3">
                                                     <label class="form-label">Select Payment Method</label>
@@ -240,6 +235,11 @@ while ($row = mysqli_fetch_assoc($result)) {
                                                     </div>
 
                                                     <input type="hidden" id="paymentMethodInput">
+                                                </div>
+                                                <!-- Amount -->
+                                                <div class="mb-3" id="amountField" style="display:none;">
+                                                    <label class="form-label">Enter Amount</label>
+                                                    <input name="amount" id="depositAmount" type="number" class="form-control" placeholder="Enter amount">
                                                 </div>
 
                                                 <button type="submit" class="btn btn-primary loading-btn">Proceed</button>
@@ -392,6 +392,19 @@ while ($row = mysqli_fetch_assoc($result)) {
                 selectedMethod = method;
                 selectedText.innerText = label;
                 methodModal.classList.remove("active");
+
+                const amountField = document.getElementById("amountField");
+
+                if (method.type === "gateway" && method.gateway_name.toLowerCase() === "cryptomus") {
+                    // ❌ Hide amount for Cryptomus
+                    amountField.style.display = "none";
+
+                    // 🔥 Redirect immediately
+                    window.location.href = "./network/";
+                } else {
+                    // ✅ Show amount for others
+                    amountField.style.display = "block";
+                }
             };
 
             methodList.appendChild(div);
@@ -412,11 +425,15 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 
 
-            const amount = parseFloat(document.getElementById("depositAmount").value);
+            let amount = null;
 
-            if (!amount || amount <= 0) {
-                toastr.error("Enter valid amount");
-                return;
+            if (!(selectedMethod.type === "gateway" && selectedMethod.gateway_name.toLowerCase() === "cryptomus")) {
+                amount = parseFloat(document.getElementById("depositAmount").value);
+
+                if (!amount || amount <= 0) {
+                    toastr.error("Enter valid amount");
+                    return;
+                }
             }
 
             if (!selectedMethod) {
@@ -436,6 +453,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     paystack(amount);
                 } else if (gateway === "cryptomus") {
                     cryptomus(amount);
+                    return;
                 } else {
                     alert("Gateway not supported");
                 }
@@ -617,7 +635,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         }
         async function cryptomus(amount) {
 
-            window.location.href = `./network/?amount=${amount}`
+            window.location.href = `./network/`
         }
 
         function paystack(amount) {
