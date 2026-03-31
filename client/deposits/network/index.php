@@ -150,6 +150,9 @@ curl_close($ch);
             margin-bottom: 10px;
             border: 1px solid #eee;
             transition: 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .modal-body .method-item:hover {
@@ -240,10 +243,10 @@ curl_close($ch);
                                             <div class="card-body">
                                                 <!-- Payment Methods -->
                                                 <div class="mb-3">
-                                                    <label class="form-label">Select Payment Method</label>
+                                                    <label class="form-label">Select Network</label>
 
                                                     <div class="custom-select-box" id="openMethodModal">
-                                                        <span id="selectedMethodText">Click to select method</span>
+                                                        <span id="selectedMethodText">Click to select network</span>
                                                         <i class="bi bi-chevron-down"></i>
                                                     </div>
 
@@ -263,7 +266,7 @@ curl_close($ch);
 
                                 <!-- ================= METHOD MODAL ================= -->
                                 <div class="custom-modal" id="methodModal">
-                                    <div class="custom-modal-content">
+                                    <div class="custom-modal-content" style="overflow-y: auto;height: 100%;">
 
                                         <div class="modal-header">
                                             <h5>Select Payment Method</h5>
@@ -272,7 +275,7 @@ curl_close($ch);
                                             </button>
                                         </div>
 
-                                        <div style="overflow-y: auto;" class="modal-body" id="methodList"></div>
+                                        <div  class="modal-body" id="methodList"></div>
 
                                     </div>
                                 </div>
@@ -299,6 +302,7 @@ curl_close($ch);
 
                                     const methods = method.result.filter(m =>
                                         allowedNetworks.includes(m.network) &&
+                                        m.currency === 'USDT' ||
                                         m.network === m.currency
                                     );
 
@@ -350,7 +354,14 @@ curl_close($ch);
                                         } = limit
 
 
-                                        div.innerText = label;
+                                        const html = `
+
+                                         <p style="margin:0;font-weight:500;">${label}</p>
+                                         <small style="color:#555;">Min: ${min_amount} - Max: ${max_amount}</small>
+                                        
+                                        `;
+
+                                        div.insertAdjacentHTML("beforeend", html);
 
                                         div.onclick = () => {
                                             selectedMethod = method;
