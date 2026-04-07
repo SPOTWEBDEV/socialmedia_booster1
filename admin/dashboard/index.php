@@ -2,6 +2,11 @@
 
 include('../../server/connection.php');
 include('../../server/auth/admin/index.php');
+include('../../server/api/boosting.php');
+
+
+
+
 
 ?>
 
@@ -90,161 +95,154 @@ include('../../server/auth/admin/index.php');
 
                 <div class="row layout-top-spacing">
 
-                    <div class="col-xl-5 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
-                        <div class="widget widget-one">
-                            <div class="widget-heading">
-                                <h6 class="">Users Statistics</h6>
-                            </div>
+                    <?php
+                    $total_user = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM users"));
 
+                    $total_approved_deposit = mysqli_num_rows(
+                        mysqli_query($connection, "SELECT * FROM deposit WHERE status='approved'")
+                    );
 
-                            <?php
+                    $deposit_sum = mysqli_fetch_assoc(
+                        mysqli_query($connection, "SELECT SUM(amount) as amount FROM deposit WHERE status='approved'")
+                    );
 
-                            $total_user = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM `users`"));
+                    $profit = mysqli_fetch_assoc(
+                        mysqli_query($connection, "SELECT SUM(profit) as profit FROM user_orders")
+                    );
 
-                            ?>
+                    $third_party_charge = $api->balance();
+                    ?>
 
-                            <div class="w-chart">
-                                <div class="w-chart-section">
-                                    <div class="w-detail">
-                                        <p class="w-title">Total Users</p>
-                                        <p class="w-stats"><?php echo $total_user; ?></p>
-                                    </div>
-                                    <div class="w-chart-render-one">
-                                        <div id="total-users"></div>
-                                    </div>
-                                </div>
-
-
-                                <?php
-
-                                $total_approved_deposit = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM `deposit` WHERE `status`='approved'"));
-
-                                ?>
-
-                                <div class="w-chart-section">
-                                    <div class="w-detail">
-                                        <p class="w-title">Total Approved deposit</p>
-                                        <p class="w-stats"><?php echo $total_approved_deposit ?></p>
-                                    </div>
-                                    <div class="w-chart-render-one">
-                                        <div id="paid-visits"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 layout-spacing">
+                    <!-- TOTAL USERS -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 layout-spacing">
                         <div class="widget widget-card-four">
                             <div class="widget-content">
                                 <div class="w-content">
                                     <div class="w-info">
-                                        <h6 class="value"><?php 
-
-                                         $deposit = mysqli_fetch_assoc(mysqli_query($connection, "SELECT  sum(amount) as amount FROM `deposit` WHERE `status`='approved'"));
-
-                                         echo $deposit['amount'];
-                                        
-                                        ?></h6>
-                                        <p class="">Total Deposit Card </p>
-                                        
+                                        <h6 class="value"><?php echo number_format($total_user); ?></h6>
+                                        <p>Total Users</p>
                                     </div>
-                                    <div class="">
-                                        <div class="w-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round"
-                                                class="feather feather-home">
-                                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-gradient-secondary" role="progressbar"
-                                        style="width: 57%" aria-valuenow="57" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="w-icon text-primary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17 21v-2a4 4 0 0 0-3-3.87"></path>
+                                            <path d="M7 21v-2a4 4 0 0 1 3-3.87"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 layout-spacing">
+                    <!-- APPROVED DEPOSITS -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 layout-spacing">
                         <div class="widget widget-card-four">
                             <div class="widget-content">
                                 <div class="w-content">
                                     <div class="w-info">
-                                        <h6 class="value"><?php 
-
-                                         $deposit = mysqli_fetch_assoc(mysqli_query($connection, "SELECT  sum(profit) as profit FROM `user_orders`"));
-
-                                         echo '$' . $deposit['profit'];
-                                        
-                                        ?></h6>
-                                        <p class="">Total Money Made </p>
-                                        
+                                        <h6 class="value"><?php echo number_format($total_approved_deposit); ?></h6>
+                                        <p>Approved Deposits</p>
                                     </div>
-                                    <div class="">
-                                        <div class="w-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round"
-                                                class="feather feather-home">
-                                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-gradient-secondary" role="progressbar"
-                                        style="width: 57%" aria-valuenow="57" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="w-icon text-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-
-                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 layout-spacing">
+                    <!-- TOTAL DEPOSIT -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 layout-spacing">
                         <div class="widget widget-card-four">
                             <div class="widget-content">
                                 <div class="w-content">
                                     <div class="w-info">
-                                        <h6 class="value"><?php 
-
-                                         $deposit = mysqli_fetch_assoc(mysqli_query($connection, "SELECT  sum(third_party_charge) as third_party_charge  FROM `user_orders`"));
-
-                                         echo '$' . $deposit['third_party_charge'];
-                                        
-                                        ?></h6>
-                                        <p class="">Total Money Expense </p>
-                                        
+                                        <h6 class="value">₦<?php echo number_format($deposit_sum['amount'] ?? 0, 2); ?></h6>
+                                        <p>Total Deposit</p>
                                     </div>
-                                    <div class="">
-                                        <div class="w-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round"
-                                                class="feather feather-home">
-                                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar bg-gradient-secondary" role="progressbar"
-                                        style="width: 57%" aria-valuenow="57" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="w-icon text-warning">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"></path>
+                                        </svg>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- PROFIT -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 layout-spacing">
+                        <div class="widget widget-card-four">
+                            <div class="widget-content">
+                                <div class="w-content">
+                                    <div class="w-info">
+                                        <h6 class="value">$<?php echo number_format($profit['profit'] ?? 0, 2); ?></h6>
+                                        <p>Total Profit</p>
+                                    </div>
+                                    <div class="w-icon text-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                            <polyline points="17 6 23 6 23 12"></polyline>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- EXPENSE -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 layout-spacing">
+                        <div class="widget widget-card-four">
+                            <div class="widget-content">
+                                <div class="w-content">
+                                    <div class="w-info">
+                                        <h6 class="value">$<?php echo number_format($expense['total'] ?? 0, 2); ?></h6>
+                                        <p>Total Expense</p>
+                                    </div>
+                                    <div class="w-icon text-danger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- THIRD PARTY BALANCE -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 col-12 layout-spacing">
+                        <div class="widget widget-card-four">
+                            <div class="widget-content">
+                                <div class="w-content">
+                                    <div class="w-info">
+                                        <h6 class="value">
+                                            <?php echo $third_party_charge->balance . ' ' . $third_party_charge->currency; ?>
+                                        </h6>
+                                        <p>API Balance</p>
+                                    </div>
+                                    <div class="w-icon text-info">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M13 2v6"></path>
+                                            <path d="M11 2v6"></path>
+                                            <path d="M5 8h14"></path>
+                                            <path d="M5 12h14"></path>
+                                            <path d="M12 12v10"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 
