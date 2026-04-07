@@ -81,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // REFERRAL BONUS LOGIC (Naira)
     // ===============================
     $referral_bonus = 0;
+    $referral_bonus_usd = 0; // ✅ ADD THIS LINE
     $getRef = $connection->prepare("SELECT referrer_id FROM users WHERE id = ?");
     $getRef->bind_param("i", $id);
     $getRef->execute();
@@ -171,9 +172,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     echo "<script>
-        
+        localStorage.removeItem('selected_service');
         alert('Order placed successfully!');
-        
+        window.location.href = '../my-order/';
     </script>";
 }
 ?>
