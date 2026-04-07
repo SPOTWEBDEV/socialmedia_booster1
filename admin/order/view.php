@@ -2372,7 +2372,7 @@ include('../../server/auth/admin/index.php');
             <div class="scrollspy-example" data-spy="scroll" data-target="#account-settings-scroll" data-offset="-100">
               <div class="row">
                
-              <div class="col-xl-12 col-lg-12 col-md-12 layout-spacing">
+              <div class="col-xl-12 col-lg-12 col-md-12 layout-spacing bg-white p-4">
 
 <?php
 if (isset($_GET['id']) && !empty($_GET['id'])) {

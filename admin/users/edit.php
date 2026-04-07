@@ -2375,123 +2375,331 @@ include('../../server/auth/admin/index.php');
 
                   <?php
 
+                  if (isset($_POST['profile_save'])) {
+
+                    $user_id = intval($_GET['id']);
+
+                    // ONLY editable fields
+                    $acct_balance      = floatval($_POST['acct_balance']);
+                    $referral_earnings = floatval($_POST['referral_earnings']);
+
+                    // Update ONLY allowed fields
+                    $statement = $connection->prepare("
+        UPDATE users 
+        SET balance = ?, referral_earnings = ?
+        WHERE id = ?
+    ");
+
+                    $statement->bind_param("ddi", $acct_balance, $referral_earnings, $user_id);
+
+                    if ($statement->execute()) {
+                      echo "
+        <script>
+            toastr.success('User balance updated successfully');
+            setTimeout(function() {
+                window.location.href = './edit.php';
+            }, 1500);
+        </script>";
+                    } else {
+                      echo "
+        <script>
+            toastr.error('Error updating user');
+        </script>";
+                    }
+
+                    $statement->close();
+                  }
+
+
+                  // FETCH USER
                   if (isset($_GET['id']) && !empty($_GET['id'])) {
 
-                    $user_id = $_GET['id'];
+                    $user_id = intval($_GET['id']);
 
                     $statment = $connection->prepare("SELECT * FROM users WHERE id = ?");
                     $statment->bind_param("i", $user_id);
                     $statment->execute();
                     $result = $statment->get_result();
+
                     if ($result->num_rows > 0) {
-                      $user = $result->fetch_assoc(); ?>
+                      $user = $result->fetch_assoc();
+                  ?>
 
-
-                      <form id="general-info" class="section general-info" enctype="multipart/form-data" method="POST">
+                      <form id="general-info" class="section general-info" method="POST">
                         <div class="info">
                           <h6>General Information</h6>
+
                           <div class="row">
                             <div class="col-lg-11 mx-auto">
                               <div class="row">
 
-
-                                <!-- Form Fields -->
                                 <div class="col-xl-10 col-lg-12 col-md-8 mt-md-0 mt-4">
                                   <div class="form">
 
-
                                     <div class="row">
-                                      <div class="col-sm-6">
+                                      <!-- FULL NAME -->
+                                      <div class="col-md-6 col-12">
                                         <div class="form-group">
-                                          <label for="fullname">Full Name</label>
+                                          <label>Full Name</label>
                                           <input type="text" class="form-control mb-4"
-                                            value="<?php echo $user['full_name']; ?>" name="fullname" autocomplete="off">
-                                        </div>
-                                      </div>
-                                      <div class="col-sm-6">
-                                        <div class="form-group">
-                                          <label for="acct_email">Email</label>
-                                          <input type="email" class="form-control mb-4" placeholder="Enter email address"
-                                            value="<?php echo $user['email']; ?>" name="acct_email" autocomplete="off">
+                                            value="<?php echo $user['full_name']; ?>" readonly>
                                         </div>
                                       </div>
 
-
-                                    </div>
-
-                                    <div class="row">
-
-
-                                      <div class="col-sm-12">
+                                      <!-- USERNAME -->
+                                      <div class="col-md-6 col-12">
                                         <div class="form-group">
-                                          <label for="acct_phone">Phone Number</label>
-                                          <input type="text" class="form-control mb-4" placeholder="Enter phone number"
-                                            value="<?php echo $user['phone']; ?>" name="acct_phone" autocomplete="off">
+                                          <label>Username</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['username']; ?>" readonly>
                                         </div>
                                       </div>
                                     </div>
 
                                     <div class="row">
-
-                                      <div class="col-sm-6">
+                                      <!-- EMAIL -->
+                                      <div class="col-md-6 col-12">
                                         <div class="form-group">
-                                          <label for="acct_limit">Account Balance</label>
-                                          <input type="text" class="form-control mb-4" placeholder="Enter account balance"
-                                            value="<?php echo $user['balance']; ?>" name="acct_balance" autocomplete="off">
+                                          <label>Email</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['email']; ?>" readonly>
                                         </div>
                                       </div>
 
-                                      <div class="col-sm-6">
+                                      <!-- PHONE -->
+                                      <div class="col-md-6 col-12">
                                         <div class="form-group">
-                                          <label for="referral_earnings">Referral Earnings</label>
-                                          <input type="text" class="form-control mb-4" 
-                                            value="<?php echo $user['referral_earnings']; ?>" name="referral_earnings" autocomplete="off">
+                                          <label>Phone</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['phone']; ?>" readonly>
                                         </div>
                                       </div>
-
                                     </div>
-
-                                    
 
                                     <div class="row">
-
-
-
-
-                                      <div class="col-sm-6">
+                                      <!-- COUNTRY -->
+                                      <div class="col-md-6 col-12">
                                         <div class="form-group">
-                                          <label for="acct_dob">Register Date</label>
-                                          <input type="text" class="form-control mb-4" value="<?php echo $user['created_at']; ?>"
-                                            name="date_created" autocomplete="off">
+                                          <label>Country</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['country']; ?>" readonly>
+                                        </div>
+                                      </div>
+
+                                      <!-- CURRENCY -->
+                                      <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                          <label>Currency</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['currency']; ?>" readonly>
                                         </div>
                                       </div>
                                     </div>
 
-                                    <div class="col-md-12">
-                                      <button class="btn btn-primary text-center" name="profile_save" type="submit">Save</button>
+                                    <div class="row">
+                                      <!-- STATUS -->
+                                      <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                          <label>Status</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['status']; ?>" readonly>
+                                        </div>
+                                      </div>
+
+                                      <!-- REGISTERED DATE -->
+                                      <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                          <label>Registered Date</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['created_at']; ?>" readonly>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div class="row">
+                                      <!-- LAST LOGIN -->
+                                      <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                          <label>Last Login</label>
+                                          <input type="text" class="form-control mb-4"
+                                            value="<?php echo $user['last_login_date']; ?>" readonly>
+                                        </div>
+                                      </div>
+
+                                      <!-- EMPTY SPACE (optional alignment) -->
+                                      <div class="col-md-6 col-12"></div>
+                                    </div>
+
+                                    <div class="row">
+                                      <!-- BALANCE -->
+                                      <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                          <label>Account Balance</label>
+                                          <input type="number" step="0.01" class="form-control mb-4"
+                                            value="<?php echo $user['balance']; ?>"
+                                            name="acct_balance" required>
+                                        </div>
+                                      </div>
+
+                                      <!-- REFERRAL -->
+                                      <div class="col-md-6 col-12">
+                                        <div class="form-group">
+                                          <label>Referral Earnings</label>
+                                          <input type="number" step="0.01" class="form-control mb-4"
+                                            value="<?php echo $user['referral_earnings']; ?>"
+                                            name="referral_earnings" required>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <button class="btn btn-primary" name="profile_save" type="submit">
+                                        Save Changes
+                                      </button>
                                     </div>
 
                                   </div>
                                 </div>
+
                               </div>
                             </div>
                           </div>
+
                         </div>
                       </form>
 
-
-
-
-
-
-                  <?php }
+                  <?php
+                    } else {
+                      echo "<div class='alert alert-danger'>User not found.</div>";
+                    }
                   } else {
                     echo "<div class='alert alert-danger'>No User ID provided.</div>";
                   }
-
                   ?>
 
                 </div>
+
+
+
+
+                <div class="col-xl-12 col-lg-12 col-md-12 layout-spacing bg-white p-4">
+
+                <div class="table-responsive mb-4 mt-4">
+                                <div id="default-ordering_wrapper"
+                                    class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <table id="default-ordering" class="table table-hover dataTable no-footer"
+                                                style="width:100%" role="grid" aria-describedby="default-ordering_info">
+                                                <thead>
+                                                    <tr role="row">
+                                                        <th class="sorting_asc" tabindex="0"
+                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
+                                                            aria-sort="ascending"
+                                                            aria-label="S/N: activate to sort column descending"
+                                                            style="width: 36.3594px;">S/N</th>
+                                                       
+                                                        <th class="sorting" tabindex="0"
+                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
+                                                            aria-label="ORDER NAME: activate to sort column ascending"
+                                                            style="width: 148.672px;"> ORDER NAME</th>
+                                                        
+                                                        <th class="sorting" tabindex="0"
+                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
+                                                            aria-label="ORDER CATEGORY: activate to sort column ascending"
+                                                            style="width: 148.672px;"> ORDER CATEGORY</th>
+                                                
+                                                        <th class="sorting" tabindex="0"
+                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
+                                                            aria-label="ORDER PRICE: activate to sort column ascending"
+                                                            style="width: 173.875px;">ORDER PRICE ($)</th>
+                                                        <th class="sorting" tabindex="0"
+                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
+                                                            aria-label="QUANITY: activate to sort column ascending"
+                                                            style="width: 127.641px;">QUANITY</th>
+                                                        
+                                                        <th class="sorting" tabindex="0"
+                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
+                                                            aria-label="DATE: activate to sort column ascending"
+                                                            style="width: 247.672px;">DATE</th>
+                                                        <th class="sorting" tabindex="0"
+                                                            aria-controls="default-ordering" rowspan="1" colspan="1"
+                                                            aria-label="STATUS: activate to sort column ascending"
+                                                            style="width: 71.6094px;">STATUS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+
+                                                    <?php
+
+                                                    $query = "SELECT user_orders.* , users.email,users.phone,users.full_name
+                                                                FROM user_orders , users 
+                                                                WHERE user_orders.user = users.id AND users.id = $user_id
+                                                                ORDER BY user_orders.id DESC";
+                                                    $result = mysqli_query($connection, $query);
+                                                    
+                                                    $count = 0;
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+
+                                                        $count++;
+                                                        $id = $row['id'];
+                                                        $name = $row['full_name'];
+                                                        $phone = $row['phone'];
+                                                        $amount = $row['order_price'];
+                                                        $order_name = $row['order_name'];
+                                                        $order_category = $row['order_category'];
+                                                        $status = $row['status'];
+                                                        $email = $row['email'];
+                                                        $quanity = $row['quanity'];
+                                                        $date = $row['created_at'];
+
+                                                        $url = $domain . "/admin/order/view.php?id=" . $id;
+
+                                                        echo "<tr role='row'>
+                                                                        <td class='sorting_1'>$count</td>
+                                                                        <td>$order_name</td>
+                                                                        <td>$order_category</td>
+                                                                        <td>$$amount</td>
+                                                                        <td>$quanity</td>
+                                                                        
+                                                                        <td>$date</td>
+                                                                         <td class='text-center'><a href='$url' class='btn btn-primary'>View</a></td>
+                                                                    </tr>";
+                                                    }
+
+
+                                                    ?>
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                  
+
+
+                  
+                  
+                  
+
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <div class="col-xl-12 col-lg-12 col-md-12 layout-spacing">
 
                   <?php
@@ -2571,7 +2779,7 @@ include('../../server/auth/admin/index.php');
                             ?>
                           </form>
 
-                         
+
 
                         </div>
                       </div>
@@ -2608,82 +2816,7 @@ include('../../server/auth/admin/index.php');
       </div>
       <!--  END CONTENT AREA  -->
     </div>
-    <?php
-    if (isset($_POST['profile_save'])) {
-      $user_id = trim($_GET['id']);
-      $acct_no        = trim($_POST['acct_no']);
-      $acct_type      = trim($_POST['acct_type']);
-      $acct_email     = trim($_POST['acct_email']);
-      $acct_dob       = trim($_POST['acct_dob']);
-      $acct_occupation = trim($_POST['acct_occupation']);
-      $acct_phone     = trim($_POST['acct_phone']);
-      $acct_cot       = trim($_POST['acct_cot']);
-      $acct_imf       = trim($_POST['acct_imf']);
-      $acct_limit     = trim($_POST['acct_limit']);
-      $acct_balance   = trim($_POST['acct_balance']);
-      $tax_code       = trim($_POST['tax_code']);
-      $acct_gender    = trim($_POST['acct_gender']);
-      $kyc            = trim($_POST['kyc']);
-      $date_created   = trim($_POST['date_created']);
 
-      // Prepare statement with ? placeholders
-      $statement = $connection->prepare("UPDATE users SET 
-            account_number = ?, 
-            account_type = ?, 
-            email = ?, 
-            birth = ?, 
-            occupation = ?, 
-            phone = ?, 
-            cot_code = ?, 
-            imf_code = ?, 
-            account_limit = ?, 
-            balance = ?, 
-            tax_code = ?, 
-            gender = ? ,
-            kyc = ?,
-            date_created=?
-            WHERE id = ?");
-
-      // Bind parameters in order
-      $statement->bind_param(
-        "ssssssssssssssi",
-        $acct_no,
-        $acct_type,
-        $acct_email,
-        $acct_dob,
-        $acct_occupation,
-        $acct_phone,
-        $acct_cot,
-        $acct_imf,
-        $acct_limit,
-        $acct_balance,
-        $tax_code,
-        $acct_gender,
-        $kyc,
-        $date_created,
-        $user_id
-      );
-
-      // Execute and check result
-      if ($statement->execute()) {
-        echo "
-              <script>
-                  toastr.success('User profile updated successfully');
-                  setTimeout(function() {
-                      location.href = '';
-                  }, 2000);
-              </script>";
-      } else {
-        echo "
-              <script>
-                  toastr.error('Error updating user profile');
-              </script>";
-      }
-
-
-      $statement->close();
-    }
-    ?>
     <!-- END MAIN CONTAINER -->
     <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
     <script src="../source/bootstrap/js/popper.min.js"></script>
