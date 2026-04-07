@@ -19,3 +19,5 @@
                                             alert("cryptomus error");
                                         }
                                     }
+
+                                    // window.location.href = '../my-order/';

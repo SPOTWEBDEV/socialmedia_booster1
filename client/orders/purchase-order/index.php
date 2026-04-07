@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<script>
         localStorage.removeItem('selected_service');
         alert('Order placed successfully!');
-        window.location.href = '../my-order/';
+        
     </script>";
 }
 ?>
