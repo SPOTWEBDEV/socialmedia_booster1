@@ -8,6 +8,7 @@ $body = json_decode(file_get_contents("php://input"), true);
 
 $user_id = intval($body['user_id'] ?? 0);
 $amount = $body['amount']; // default
+$network = $body['network']; // default
 $currency = $body['currency'];
 
 if ($user_id <= 0) {
@@ -18,7 +19,7 @@ if ($user_id <= 0) {
 /* -------------------------
 FETCH USER
 ------------------------- */
-$stmt = $connection->prepare("SELECT email FROM users WHERE id = ?");
+$stmt = $connection->prepare("SELECT email , full_name FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -40,6 +41,12 @@ $data = [
     "amount" => (string)$amount,
     "currency" => $currency,
     "order_id" => $order_id,
+    "network" => $network,
+    "additional_data"=>  // suppose to be a string but we can encode an array or object to JSON and send as string
+        json_encode([
+            "user_id" => $user_id,
+            "email" => $result->fetch_assoc()['email']
+        ]),
 
     // 🔥 redirects
     "url_success" => $domain . "client/deposits/status/cry/?action=success&order_id=" . $order_id,

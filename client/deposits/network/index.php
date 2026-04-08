@@ -401,7 +401,8 @@ curl_close($ch);
                                         
 
                                         
-                                        console.log(amount , 'USD')
+                                        console.log("Select Network:", selectedMethod.network  + " Amount:", amount + "Currency:" + selectedMethod.currency);
+                                        
                                         const response = await fetch("<?= $domain ?>server/api/cryptomus-init.php", {
                                             method: "POST",
                                             headers: {
