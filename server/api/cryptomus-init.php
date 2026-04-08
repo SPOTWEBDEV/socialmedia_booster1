@@ -7,8 +7,8 @@ header('Content-Type: application/json');
 $body = json_decode(file_get_contents("php://input"), true);
 
 $user_id = intval($body['user_id'] ?? 0);
-
-
+$amount = $body['amount']; // default
+$currency = $body['currency'];
 
 if ($user_id <= 0) {
     echo json_encode(["error" => "Invalid user"]);
@@ -18,8 +18,7 @@ if ($user_id <= 0) {
 /* -------------------------
 FETCH USER
 ------------------------- */
-
-$stmt = $connection->prepare("SELECT email, phone, full_name FROM users WHERE id = ?");
+$stmt = $connection->prepare("SELECT email FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -29,37 +28,25 @@ if ($result->num_rows === 0) {
     exit;
 }
 
-$user = $result->fetch_assoc();
-
-/* -------------------------
-CRYPTOMUS CONFIG
-------------------------- */
-
-
-
-
-
 /* -------------------------
 CREATE ORDER
 ------------------------- */
-
 $order_id = uniqid("CRY_");
 
-$network = $body['network'] ?? '';
-$currency = $body['currency'] ?? '';
-
-if (!$network || !$currency) {
-    echo json_encode([
-        "error" => "Network or currency missing"
-    ]);
-    exit;
-}
-
+/* -------------------------
+REQUEST DATA
+------------------------- */
 $data = [
+    "amount" => (string)$amount,
     "currency" => $currency,
-    "network" => $network,
     "order_id" => $order_id,
-    "url_callback" => $domain .  "server/api/cryptomus-callback.php"
+
+    // 🔥 redirects
+    "url_success" => $domain . "client/deposits/status/cry/?action=success&order_id=" . $order_id,
+    "url_return"  => $domain . "client/deposits/status/cry/?action=cancel&order_id=" . $order_id,
+
+    // 🔥 webhook
+    "url_callback" => $domain . "server/api/cryptomus-callback.php"
 ];
 
 $jsonData = json_encode($data);
@@ -67,11 +54,12 @@ $jsonData = json_encode($data);
 /* -------------------------
 SIGNATURE
 ------------------------- */
-$URL = "https://api.cryptomus.com/v1/wallet";
+$URL = "https://api.cryptomus.com/v1/payment";
 $sign = md5(base64_encode($jsonData) . $API_KEY);
 
-
-
+/* -------------------------
+CURL REQUEST
+------------------------- */
 $ch = curl_init($URL);
 
 curl_setopt_array($ch, [
@@ -87,39 +75,40 @@ curl_setopt_array($ch, [
 
 $response = curl_exec($ch);
 
-
-
 if (curl_errno($ch)) {
-    echo json_encode([
-        "error" => curl_error($ch)
-    ]);
+    echo json_encode(["error" => curl_error($ch)]);
     exit;
 }
 
 $result = json_decode($response, true);
 
+/* -------------------------
+SUCCESS
+------------------------- */
 if ($result['state'] == 0) {
 
-    $wallet = $result['result']['address'];
-    $url = $result['result']['url'];
-    $access_code = $result['result']['uuid'];
+    $payment_url = $result['result']['url'];
+    $uuid = $result['result']['uuid'];
+
+    $response_json = json_encode($result);
 
     $stmt = $connection->prepare(
         "INSERT INTO deposit (user_id, reference, currency, network, status, response, access_code)
-        VALUES (?, ?, ?, ?, 'pending', ?, ?)"
+         VALUES (?, ?, ?, ?, 'pending', ?, ?)"
     );
 
-    $stmt->bind_param("isdssss", $user_id, $order_id, $currency, $network, $response, $access_code);
+    // network not needed → reuse currency or set NULL
+    $network = $currency;
+
+    $stmt->bind_param("isssss", $user_id, $order_id, $currency, $network, $response_json, $uuid);
     $stmt->execute();
 
     echo json_encode([
         "status" => true,
-        "wallet_address" => $wallet,
-        "network" => $network,
-        "currency" => $currency,
-        "authorization_url" => $url
+        "payment_url" => $payment_url,
+        "reference" => $order_id,
+        "response"=>$result['result']
     ]);
-
 } else {
     echo json_encode([
         "error" => $result

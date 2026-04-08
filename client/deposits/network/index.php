@@ -241,17 +241,26 @@ curl_close($ch);
                                                 <h4 class="card-title">Select Network</h4>
                                             </div>
                                             <div class="card-body">
-                                                <!-- Payment Methods -->
+                                               
+                                                
+
                                                 <div class="mb-3">
                                                     <label class="form-label">Select Network</label>
 
                                                     <div class="custom-select-box" id="openMethodModal">
-                                                        <span id="selectedMethodText">Click to select network</span>
+                                                        <span id="selectedMethodText">Click to select network or currency</span>
                                                         <i class="bi bi-chevron-down"></i>
                                                     </div>
 
                                                     <input type="hidden" id="paymentMethodInput">
                                                 </div>
+
+                                                 <!-- Payment Methods -->
+                                                 <div class="mb-3">
+                                                    <label class="form-label">Enter Amount (in the selected currency)</label>
+                                                    <input type="number" class="form-control" id="depositAmount" placeholder="Enter amount" required>
+                                                </div>
+
 
                                                
 
@@ -382,9 +391,17 @@ curl_close($ch);
                                             toastr.error("Select payment method");
                                             return;
                                         }
+                                        const amount = document.getElementById("depositAmount").value;
+
+                                        if(amount <= 0 || isNaN(amount) || amount === "") {
+                                            toastr.error("Enter valid amount");
+                                            return;
+                                        }
 
                                         
 
+                                        
+                                        console.log(amount , 'USD')
                                         const response = await fetch("<?= $domain ?>server/api/cryptomus-init.php", {
                                             method: "POST",
                                             headers: {
@@ -393,7 +410,8 @@ curl_close($ch);
                                             body: JSON.stringify({
                                                 user_id: "<?= $id ?>",
                                                 network: selectedMethod.network,
-                                                currency: selectedMethod.currency
+                                                currency: selectedMethod.currency,
+                                                amount
                                             })
                                         });
 
@@ -406,11 +424,13 @@ curl_close($ch);
 
                                         console.log(data)
 
-                                        if (data.status && data.authorization_url) {
-                                            window.open(data.authorization_url, "_blank");
+                                        if (data.status && data.authorization_url || data.status && data.payment_url) {
+                                            const url = data.authorization_url || data.payment_url;
+                                            window.location.href = url;
+                                              
                                         } else {
                                             alert("cryptomus error");
-                                        }
+                                        } 
                                     });
                                 </script>
 
