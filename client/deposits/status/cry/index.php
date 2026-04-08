@@ -1,11 +1,20 @@
 <?php 
-include("../../../server/connection.php");
-include('../../../server/auth/client.php');
+include("../../../../server/connection.php");
+include('../../../../server/auth/client.php');
 
 $order_id = $_GET['order_id'] ?? '';
+$action = $_GET['action'] ?? ''; //  cancel or success
 
-if (!$order_id) {
+if(!$order_id) {
     die("Invalid order");
+};
+
+if($action === 'cancel') {
+    // Update deposit status to declined
+    $stmt = $connection->prepare("UPDATE deposit SET status = 'declined' WHERE reference = ?");
+    $stmt->bind_param("s", $order_id);
+    $stmt->execute();
+    $stmt->close();
 }
 
 // -------------------------
@@ -49,8 +58,8 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
 <body class="dashboard">
 <div id="main-wrapper">
 
-    <?php include("../../include/header.php") ?>
-    <?php include("../../include/sidenav.php") ?>
+    <?php include("../../../include/header.php") ?>
+    <?php include("../../../include/sidenav.php") ?>
 
     <div class="content-body">
         <div class="container">
@@ -65,7 +74,7 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
                                 </div>
                             </div>
                             <div class="col-auto">
-                                <a href="../"><button class="btn btn-primary mr-2">Make Deposit</button></a>
+                                <a href="<?php echo $domain ?>client/despoits"><button class="btn btn-primary mr-2">Make Deposit</button></a>
                             </div>
                         </div>
                     </div>
@@ -150,7 +159,7 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
                 </div>
             </div>
 
-            <?php if (!$isSuccess && $paymentStatus !== 'declined'): ?>
+            <?php if (!$isSuccess && $paymentStatus !== 'declined' && $action !== 'cancel'): ?>
                 <script>
                     setTimeout(function() {
                         window.location.reload();

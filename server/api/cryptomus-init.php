@@ -93,14 +93,14 @@ if ($result['state'] == 0) {
     $response_json = json_encode($result);
 
     $stmt = $connection->prepare(
-        "INSERT INTO deposit (user_id, reference, currency, network, status, response, access_code)
-         VALUES (?, ?, ?, ?, 'pending', ?, ?)"
+        "INSERT INTO deposit (user_id, reference, currency, network, status, response, access_code , amount)
+         VALUES (?, ?, ?, ?, 'pending', ?, ?, ?)"
     );
 
     // network not needed → reuse currency or set NULL
     $network = $currency;
 
-    $stmt->bind_param("isssss", $user_id, $order_id, $currency, $network, $response_json, $uuid);
+    $stmt->bind_param("issssss", $user_id, $order_id, $currency, $network, $response_json, $uuid, $amount);
     $stmt->execute();
 
     echo json_encode([
