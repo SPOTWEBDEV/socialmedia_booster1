@@ -22,7 +22,7 @@ if($action === 'cancel') {
 // FETCH DEPOSIT DETAILS
 // -------------------------
 $stmt = $connection->prepare(
-    "SELECT d.user_id, d.amount, d.status, d.reference, u.full_name, u.email, u.phone, u.balance
+    "SELECT d.user_id, d.amount, d.status, d.reference, u.full_name, u.email, u.phone, u.balance , d.currency , d.network
      FROM deposit d
      JOIN users u ON d.user_id = u.id
      WHERE d.reference = ?"
@@ -131,7 +131,7 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-6 text-muted">Amount</div>
-                                    <div class="col-6 text-end fw-bold">₦<?= number_format($deposit['amount'] ?? 0, 2) ?></div>
+                                    <div class="col-6 text-end fw-bold"><?= number_format($deposit['amount'] ?? 0, 2) ?> <?= htmlspecialchars($deposit['currency'] ?? '') ?> (<?= htmlspecialchars($deposit['network'] ?? '') ?>)</div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-6 text-muted">Full Name</div>
