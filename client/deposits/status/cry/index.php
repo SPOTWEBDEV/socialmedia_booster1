@@ -17,6 +17,10 @@ if($action === 'cancel') {
     $stmt->close();
 }
 
+if($action !== 'success') {
+    header("Refresh: 1; url=../../"); 
+}
+
 // -------------------------
 // FETCH DEPOSIT DETAILS
 // -------------------------

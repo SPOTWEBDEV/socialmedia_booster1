@@ -301,7 +301,7 @@ curl_close($ch);
                                     const allowedNetworks = [
                                         "BTC",
                                         "ETH",
-                                        "TRX",
+                                        "TRON",
                                         "SOL",
                                         "LTC",
                                         "DOGE",
