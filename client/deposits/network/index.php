@@ -234,15 +234,15 @@ curl_close($ch);
                             <div class="row g-4">
 
                                 <form id="depositForm">
-                                    
+
                                     <div class="col-12">
                                         <div class="card">
                                             <div class="card-header">
                                                 <h4 class="card-title">Select Network</h4>
                                             </div>
                                             <div class="card-body">
-                                               
-                                                
+
+
 
                                                 <div class="mb-3">
                                                     <label class="form-label">Select Network</label>
@@ -255,14 +255,14 @@ curl_close($ch);
                                                     <input type="hidden" id="paymentMethodInput">
                                                 </div>
 
-                                                 <!-- Payment Methods -->
-                                                 <div class="mb-3">
+                                                <!-- Payment Methods -->
+                                                <div class="mb-3">
                                                     <label class="form-label">Enter Amount (in the selected currency)</label>
-                                                    <input type="number" class="form-control" id="depositAmount" placeholder="Enter amount" required>
+                                                    <input type="number" step="any" class="form-control" id="depositAmount" placeholder="Enter amount" required>
                                                 </div>
 
 
-                                               
+
 
 
                                                 <button type="submit" class="btn btn-primary">Proceed</button>
@@ -284,7 +284,7 @@ curl_close($ch);
                                             </button>
                                         </div>
 
-                                        <div  class="modal-body" id="methodList"></div>
+                                        <div class="modal-body" id="methodList"></div>
 
                                     </div>
                                 </div>
@@ -319,7 +319,7 @@ curl_close($ch);
 
 
                                     let selectedMethod = null;
-                                   
+
 
                                     /* ================= METHOD MODAL ================= */
 
@@ -375,6 +375,22 @@ curl_close($ch);
                                         div.onclick = () => {
                                             selectedMethod = method;
                                             selectedText.innerText = label;
+
+                                            const input = document.getElementById("depositAmount");
+
+                                            const min = method.limit.min_amount;
+                                            const max = method.limit.max_amount;
+
+                                            // Apply min and max to input
+                                            input.min = min;
+                                            input.max = max;
+
+                                            // Optional: clear previous value
+                                            input.value = "";
+
+                                            // Optional: show hint
+                                            input.placeholder = `Enter amount (${min} - ${max})`;
+
                                             methodModal.classList.remove("active");
                                         };
 
@@ -393,16 +409,16 @@ curl_close($ch);
                                         }
                                         const amount = document.getElementById("depositAmount").value;
 
-                                        if(amount <= 0 || isNaN(amount) || amount === "") {
+                                        if (amount <= 0 || isNaN(amount) || amount === "") {
                                             toastr.error("Enter valid amount");
                                             return;
                                         }
 
-                                        
 
-                                        
-                                        console.log("Select Network:", selectedMethod.network  + " Amount:", amount + "Currency:" + selectedMethod.currency);
-                                        
+
+
+                                        console.log("Select Network:", selectedMethod.network + " Amount:", amount + "Currency:" + selectedMethod.currency);
+
                                         const response = await fetch("<?= $domain ?>server/api/cryptomus-init.php", {
                                             method: "POST",
                                             headers: {
@@ -428,10 +444,10 @@ curl_close($ch);
                                         if (data.status && data.authorization_url || data.status && data.payment_url) {
                                             const url = data.authorization_url || data.payment_url;
                                             window.location.href = url;
-                                              
+
                                         } else {
-                                            alert("cryptomus error");
-                                        } 
+                                            alert("Something went wrong. Please try again later.");
+                                        }
                                     });
                                 </script>
 
