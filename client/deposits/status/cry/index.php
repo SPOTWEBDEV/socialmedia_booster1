@@ -17,7 +17,7 @@ if (!$order_id) {
 $stmt = $connection->prepare("
     SELECT d.user_id, d.amount, d.status, d.reference,
            u.full_name, u.email, u.phone, u.balance,
-           d.currency, d.network
+           d.currency, d.network , d.crypto_currency
     FROM deposit d
     JOIN users u ON d.user_id = u.id
     WHERE d.reference = ?
@@ -65,6 +65,7 @@ if ($deposit && $deposit['status'] === 'pending') {
     curl_close($ch);
 
     $result = json_decode($response, true);
+
 
     if (isset($result['state']) && $result['state'] == 0) {
 
@@ -222,7 +223,7 @@ $btnColor = $isSuccess ? "bg-green-600 hover:bg-green-700" : ($paymentStatus ===
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-6 text-muted">Amount</div>
-                                    <div class="col-6 text-end fw-bold"><?= number_format($deposit['amount'] ?? 0, 2) ?> <?= htmlspecialchars($deposit['currency'] ?? '') ?> (<?= htmlspecialchars($deposit['network'] ?? '') ?>)</div>
+                                    <div class="col-6 text-end fw-bold"><?= number_format($deposit['amount'] ?? 0, 2) ?> <?= $deposit['currency'] ?></div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-6 text-muted">Full Name</div>

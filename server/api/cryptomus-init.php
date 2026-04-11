@@ -43,11 +43,11 @@ $data = [
     "order_id" => $order_id,
     "to_currency" => $currency,    // 🔥 crypto user selected
     "network" => $network,
-    "additional_data"=>  // suppose to be a string but we can encode an array or object to JSON and send as string
-        json_encode([
-            "user_id" => $user_id,
-            "email" => $result->fetch_assoc()['email']
-        ]),
+    "additional_data" =>  // suppose to be a string but we can encode an array or object to JSON and send as string
+    json_encode([
+        "user_id" => $user_id,
+        "email" => $result->fetch_assoc()['email']
+    ]),
 
     // 🔥 redirects
     "url_success" => $domain . "client/deposits/status/cry/?action=success&order_id=" . $order_id,
@@ -105,15 +105,26 @@ if ($result['state'] == 0) {
          VALUES (?, ?, ?, ? , ?, 'pending', ?, ?, ?)"
     );
 
+    $fiat_currency = "USD";
 
-    $stmt->bind_param("isssssss", $user_id, $order_id, "USD",  $currency, $network, $response_json, $uuid, $amount);
+    $stmt->bind_param(
+        "issssssd",
+        $user_id,
+        $order_id,
+        $fiat_currency,
+        $currency,
+        $network,
+        $response_json,
+        $uuid,
+        $amount
+    );
     $stmt->execute();
 
     echo json_encode([
         "status" => true,
         "payment_url" => $payment_url,
         "reference" => $order_id,
-        "response"=>$result['result']
+        "response" => $result['result']
     ]);
 } else {
     echo json_encode([
