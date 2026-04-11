@@ -8,7 +8,7 @@ $input = file_get_contents("php://input");
 $data = json_decode($input, true);
 
 $order_id = $data['order_id'] ?? '';
-$status = $data['payment_status'] ?? '';
+$status   = $data['payment_status'] ?? '';
 
 if (!$order_id) {
     exit("No order_id");
@@ -18,7 +18,7 @@ if (!$order_id) {
 if ($status === "paid" || $status === "paid_over") {
 
     // 🔍 Get deposit
-    $stmt = $connection->prepare("SELECT user_id, amount, status FROM deposit WHERE reference = ?");
+    $stmt = $connection->prepare("SELECT user_id, amount FROM deposit WHERE reference = ?");
     $stmt->bind_param("s", $order_id);
     $stmt->execute();
     $deposit = $stmt->get_result()->fetch_assoc();
@@ -26,21 +26,29 @@ if ($status === "paid" || $status === "paid_over") {
 
     if ($deposit) {
 
-        // 🔐 جلوگیری از duplicate credit (VERY IMPORTANT)
-        if ($deposit['status'] !== 'approved') {
+        // ✅ ATOMIC UPDATE (prevents double credit)
+        $stmt = $connection->prepare("
+            UPDATE deposit 
+            SET status = 'approved' 
+            WHERE reference = ? AND status = 'pending'
+        ");
+        $stmt->bind_param("s", $order_id);
+        $stmt->execute();
 
-            // ✅ update deposit
-            $stmt = $connection->prepare("UPDATE deposit SET status = 'approved' WHERE reference = ?");
-            $stmt->bind_param("s", $order_id);
-            $stmt->execute();
-            $stmt->close();
+        if ($stmt->affected_rows > 0) {
 
-            // ✅ credit user balance
-            $stmt = $connection->prepare("UPDATE users SET balance = balance + ? WHERE id = ?");
-            $stmt->bind_param("di", $deposit['amount'], $deposit['user_id']);
-            $stmt->execute();
-            $stmt->close();
+            // ✅ ONLY credit if status changed
+            $stmt2 = $connection->prepare("
+                UPDATE users 
+                SET balance = balance + ? 
+                WHERE id = ?
+            ");
+            $stmt2->bind_param("di", $deposit['amount'], $deposit['user_id']);
+            $stmt2->execute();
+            $stmt2->close();
         }
+
+        $stmt->close();
     }
 }
 

@@ -2,43 +2,134 @@
 include("../../../../server/connection.php");
 include('../../../../server/auth/client.php');
 
+
+
 $order_id = $_GET['order_id'] ?? '';
-$action = $_GET['action'] ?? ''; //  cancel or success
+$action   = $_GET['action'] ?? '';
 
-if(!$order_id) {
+if (!$order_id) {
     die("Invalid order");
-};
-
-if($action === 'cancel') {
-    // Update deposit status to declined
-    $stmt = $connection->prepare("UPDATE deposit SET status = 'declined' WHERE reference = ?");
-    $stmt->bind_param("s", $order_id);
-    $stmt->execute();
-    $stmt->close();
 }
 
-
 // -------------------------
-// FETCH DEPOSIT DETAILS
+// FETCH DEPOSIT
 // -------------------------
-$stmt = $connection->prepare(
-    "SELECT d.user_id, d.amount, d.status, d.reference, u.full_name, u.email, u.phone, u.balance , d.currency , d.network
-     FROM deposit d
-     JOIN users u ON d.user_id = u.id
-     WHERE d.reference = ?"
-);
+$stmt = $connection->prepare("
+    SELECT d.user_id, d.amount, d.status, d.reference,
+           u.full_name, u.email, u.phone, u.balance,
+           d.currency, d.network
+    FROM deposit d
+    JOIN users u ON d.user_id = u.id
+    WHERE d.reference = ?
+");
 $stmt->bind_param("s", $order_id);
 $stmt->execute();
 $deposit = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 // -------------------------
-// DETERMINE PAYMENT STATUS
+// CANCEL (SAFE)
 // -------------------------
-$paymentStatus = $deposit['status'] ?? 'pending'; // Use DB status
-$isSuccess = $paymentStatus === 'paid' || $paymentStatus === 'approved';
+if ($action === 'cancel' && $deposit['status'] === 'pending') {
+    $stmt = $connection->prepare("UPDATE deposit SET status = 'declined' WHERE reference = ?");
+    $stmt->bind_param("s", $order_id);
+    $stmt->execute();
+    $stmt->close();
 
-$title = $isSuccess ? "Payment Successful" : ($paymentStatus === 'declined' ? "Payment Failed" : "Pending Payment");
+    $deposit['status'] = 'declined';
+}
+
+// -------------------------
+// VERIFY WITH CRYPTOMUS
+// -------------------------
+if ($deposit && $deposit['status'] === 'pending') {
+
+    $data = ["order_id" => $order_id];
+    $jsonData = json_encode($data);
+    $sign = md5(base64_encode($jsonData) . $API_KEY);
+
+    $ch = curl_init("https://api.cryptomus.com/v1/payment/info");
+
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => $jsonData,
+        CURLOPT_HTTPHEADER => [
+            "merchant: $MERCHANT_UUID",
+            "sign: $sign",
+            "Content-Type: application/json"
+        ]
+    ]);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $result = json_decode($response, true);
+
+    if (isset($result['state']) && $result['state'] == 0) {
+
+        $apiStatus = $result['result']['payment_status'];
+
+        // -------------------------
+        // SUCCESS
+        // -------------------------
+        if ($apiStatus === "paid" || $apiStatus === "paid_over") {
+
+            // ✅ ATOMIC UPDATE
+            $stmt = $connection->prepare("
+                UPDATE deposit 
+                SET status = 'approved' 
+                WHERE reference = ? AND status = 'pending'
+            ");
+            $stmt->bind_param("s", $order_id);
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+
+                // ✅ credit user ONCE
+                $stmt2 = $connection->prepare("
+                    UPDATE users 
+                    SET balance = balance + ? 
+                    WHERE id = ?
+                ");
+                $stmt2->bind_param("di", $deposit['amount'], $deposit['user_id']);
+                $stmt2->execute();
+                $stmt2->close();
+            }
+
+            $stmt->close();
+            $deposit['status'] = 'approved';
+        }
+
+        // -------------------------
+        // FAILED
+        // -------------------------
+        elseif ($apiStatus === "cancel" || $apiStatus === "fail") {
+
+            $stmt = $connection->prepare("
+                UPDATE deposit 
+                SET status = 'declined' 
+                WHERE reference = ? AND status = 'pending'
+            ");
+            $stmt->bind_param("s", $order_id);
+            $stmt->execute();
+            $stmt->close();
+
+            $deposit['status'] = 'declined';
+        }
+    }
+}
+
+// -------------------------
+// UI LOGIC
+// -------------------------
+$paymentStatus = $deposit['status'] ?? 'pending';
+$isSuccess = $paymentStatus === 'approved';
+
+$title = $isSuccess ? "Payment Successful" :
+         ($paymentStatus === 'declined' ? "Payment Failed" : "Pending Payment");
+
+
 $bgColor = $isSuccess ? "bg-green-50" : ($paymentStatus === 'declined' ? "bg-red-50" : "bg-yellow-50");
 $iconBg = $isSuccess ? "bg-green-100" : ($paymentStatus === 'declined' ? "bg-red-100" : "bg-yellow-100");
 $textColor = $isSuccess ? "text-green-600" : ($paymentStatus === 'declined' ? "text-red-600" : "text-yellow-600");

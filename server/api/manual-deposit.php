@@ -32,8 +32,8 @@ if (isset($_FILES['receipt']) && $_FILES['receipt']['error'] === 0) {
 }
 
 $stmt = $connection->prepare("
-    INSERT INTO deposit (user_id, type_id, amount, receipt, status, reference)
-    VALUES (?, ?, ?, ?, 'pending', ?)
+    INSERT INTO deposit (user_id, type_id, amount, receipt, status, reference , currency , network)
+    VALUES (?, ?, ?, ?, 'pending', ?, ?, ?)
 ");
 
 if (!$stmt) {
@@ -44,7 +44,7 @@ if (!$stmt) {
     exit;
 }
 
-$stmt->bind_param("iidss", $user_id, $method_id, $amount, $receipt_name, $reference);
+$stmt->bind_param("iidsss", $user_id, $method_id, $amount, $receipt_name, $reference , "NAIRA" , "NGN");
 
 if (!$stmt->execute()) {
     echo json_encode([

@@ -84,10 +84,10 @@ if (!empty($res['data']['authorization_url'])) {
     $accessCode = $res['data']['access_code'] ?? null;
 
     $stmt = $connection->prepare(
-        "INSERT INTO deposit (user_id, reference, access_code, amount, status)
-         VALUES (?, ?, ?, ?, 'pending')"
+        "INSERT INTO deposit (user_id, reference, access_code, amount, status , currency, network)
+         VALUES (?, ?, ?, ?, 'pending', ?, ?)"
     );
-    $stmt->bind_param("issd", $user_id, $reference, $accessCode, $amount);
+    $stmt->bind_param("issdss", $user_id, $reference, $accessCode, $amount, "NAIRA", "NGN");
     $stmt->execute();
 
     echo json_encode([

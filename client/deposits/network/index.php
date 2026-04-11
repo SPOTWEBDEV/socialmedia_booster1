@@ -257,7 +257,7 @@ curl_close($ch);
 
                                                 <!-- Payment Methods -->
                                                 <div class="mb-3">
-                                                    <label class="form-label">Enter Amount (in the selected currency)</label>
+                                                    <label class="form-label">Enter Amount (USD)</label>
                                                     <input type="number" step="any" class="form-control" id="depositAmount" placeholder="Enter amount" required>
                                                 </div>
 
@@ -375,22 +375,6 @@ curl_close($ch);
                                         div.onclick = () => {
                                             selectedMethod = method;
                                             selectedText.innerText = label;
-
-                                            const input = document.getElementById("depositAmount");
-
-                                            const min = method.limit.min_amount;
-                                            const max = method.limit.max_amount;
-
-                                            // Apply min and max to input
-                                            input.min = min;
-                                            input.max = max;
-
-                                            // Optional: clear previous value
-                                            input.value = "";
-
-                                            // Optional: show hint
-                                            input.placeholder = `Enter amount (${min} - ${max})`;
-
                                             methodModal.classList.remove("active");
                                         };
 

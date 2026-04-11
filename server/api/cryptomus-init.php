@@ -38,9 +38,10 @@ $order_id = uniqid("CRY_");
 REQUEST DATA
 ------------------------- */
 $data = [
-    "amount" => (string)$amount,
-    "currency" => $currency,
+    "amount" => (string)$amount,   // USD amount
+    "currency" => "USD",           // 🔥 base currency
     "order_id" => $order_id,
+    "to_currency" => $currency,    // 🔥 crypto user selected
     "network" => $network,
     "additional_data"=>  // suppose to be a string but we can encode an array or object to JSON and send as string
         json_encode([
@@ -100,14 +101,12 @@ if ($result['state'] == 0) {
     $response_json = json_encode($result);
 
     $stmt = $connection->prepare(
-        "INSERT INTO deposit (user_id, reference, currency, network, status, response, access_code , amount)
-         VALUES (?, ?, ?, ?, 'pending', ?, ?, ?)"
+        "INSERT INTO deposit (user_id, reference, currency, crypto_currency , network, status, response, access_code , amount)
+         VALUES (?, ?, ?, ? , ?, 'pending', ?, ?, ?)"
     );
 
-    // network not needed → reuse currency or set NULL
-    $network = $currency;
 
-    $stmt->bind_param("issssss", $user_id, $order_id, $currency, $network, $response_json, $uuid, $amount);
+    $stmt->bind_param("isssssss", $user_id, $order_id, "USD",  $currency, $network, $response_json, $uuid, $amount);
     $stmt->execute();
 
     echo json_encode([

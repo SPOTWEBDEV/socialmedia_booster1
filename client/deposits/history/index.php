@@ -57,11 +57,8 @@ $user_id = $_SESSION['user_id'];
 
                 <div class="row">
                     <?php
-                    $limit = 10;
-                    $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$page = $_GET['page'] : 1;
-                    $offset = ($page - 1) * $limit;
 
-                    /* COUNT TOTAL RECORDS */
+                    // COUNT TOTAL RECORDS (optional - remove if not needed)
                     $count_sql = "SELECT COUNT(*) AS total FROM deposit WHERE user_id = ?";
                     $count_stmt = mysqli_prepare($connection, $count_sql);
                     mysqli_stmt_bind_param($count_stmt, "i", $user_id);
@@ -69,10 +66,10 @@ $user_id = $_SESSION['user_id'];
                     $count_result = mysqli_stmt_get_result($count_stmt);
                     $total_row = mysqli_fetch_assoc($count_result);
                     $total_records = $total_row['total'];
-                    $total_pages = ceil($total_records / $limit);
                     mysqli_stmt_close($count_stmt);
 
-                    /* FETCH DEPOSIT HISTORY */
+
+                    // FETCH DEPOSIT HISTORY (no LIMIT, no OFFSET)
                     $sql = "
     SELECT 
         id,
@@ -87,11 +84,10 @@ $user_id = $_SESSION['user_id'];
     FROM deposit
     WHERE user_id = ?
     ORDER BY id DESC
-    LIMIT ? OFFSET ?
 ";
 
                     $stmt = mysqli_prepare($connection, $sql);
-                    mysqli_stmt_bind_param($stmt, "iii", $user_id, $limit, $offset);
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
                     mysqli_stmt_execute($stmt);
                     $result = mysqli_stmt_get_result($stmt);
                     ?>
@@ -107,13 +103,13 @@ $user_id = $_SESSION['user_id'];
                         </thead>
                         <tbody>
 
-                            <?php if (mysqli_num_rows($result) > 0): $sn = $offset + 1; ?>
+                            <?php if (mysqli_num_rows($result) > 0): $sn = 1; ?>
                                 <?php while ($row = mysqli_fetch_assoc($result)): ?>
                                     <tr>
                                         <td><?= $sn++ ?></td>
                                         <td><?= htmlspecialchars($row['reference']) ?></td>
-                                        <td>₦<?= $row['amount'] ? number_format($row['amount'], 2) : '0.00' ?></td>
-                                        <td><?= date("Y-m-d", strtotime($row['created_at'])) ?></td>
+                                        <td><?= $row['amount'] ? number_format($row['amount'], 2) : '0.00' ?> <?= ($row['currency'] != NULL) ? $row['currency'] : 'NAIRA' ?></td>
+                                        <td><?= date("Y-m-d H:i:s", strtotime($row['created_at'])) ?></td>
                                         <td>
                                             <span class="badge
                             <?php
