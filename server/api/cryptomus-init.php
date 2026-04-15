@@ -54,7 +54,7 @@ $data = [
     "url_return"  => $domain . "client/deposits/status/cry/?action=cancel&order_id=" . $order_id,
 
     // 🔥 webhook
-    "url_callback" => $domain . "server/api/cryptomus-callback.php"
+    // "url_callback" => $domain . "server/api/cryptomus-callback.php"
 ];
 
 $jsonData = json_encode($data);
