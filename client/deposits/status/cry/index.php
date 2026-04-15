@@ -2,6 +2,18 @@
 include("../../../../server/connection.php");
 include('../../../../server/auth/client.php');
 
+// Function to truncate decimal values
+function truncateDecimal($number, $precision = 4) {
+    $factor = pow(10, $precision);
+    return floor($number * $factor) / $factor;
+}
+
+
+// Fetch site price and USD rate
+$get = mysqli_query($connection, "SELECT  rateusd FROM sitedetails ORDER BY id LIMIT 1");
+$data = mysqli_fetch_assoc($get);
+$rate = floatval($data['rateusd'] ?? 0);
+
 
 
 $order_id = $_GET['order_id'] ?? '';
@@ -67,6 +79,7 @@ if ($deposit && $deposit['status'] === 'pending') {
     $result = json_decode($response, true);
 
 
+
     if (isset($result['state']) && $result['state'] == 0) {
 
         $apiStatus = $result['result']['payment_status'];
@@ -85,7 +98,13 @@ if ($deposit && $deposit['status'] === 'pending') {
             $stmt->bind_param("s", $order_id);
             $stmt->execute();
 
+           
+
             if ($stmt->affected_rows > 0) {
+               
+
+
+                $naria_amount = truncateDecimal($deposit['amount'] * $rate, 4); // Naira
 
                 // ✅ credit user ONCE
                 $stmt2 = $connection->prepare("
@@ -93,7 +112,7 @@ if ($deposit && $deposit['status'] === 'pending') {
                     SET balance = balance + ? 
                     WHERE id = ?
                 ");
-                $stmt2->bind_param("di", $deposit['amount'], $deposit['user_id']);
+                $stmt2->bind_param("di", $naria_amount , $deposit['user_id']);
                 $stmt2->execute();
                 $stmt2->close();
             }
